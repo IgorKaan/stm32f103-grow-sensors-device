@@ -1,0 +1,5 @@
+LoRa_led_control.c:3:6:lora_led_struct_init	32	static
+LoRa_led_control.c:37:6:lora_led_struct_set_IN	8	static
+LoRa_led_control.c:41:6:lora_led_struct_set_OUT	8	static
+LoRa_led_control.c:45:6:lora_led_struct_set_REG	0	static
+LoRa_led_control.c:48:6:lora_led_struct_time_work	16	static

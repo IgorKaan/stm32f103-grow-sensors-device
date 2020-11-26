@@ -1,0 +1,10 @@
+main.c:127:8:user_i2c_read	40	static
+main.c:135:6:user_delay_ms	0	static
+main.c:140:8:user_i2c_write	40	static
+main.c:503:6:StartTask01	32	static
+main.c:557:6:StartTask03	8	static
+main.c:529:6:StartTask02	16	static
+main.c:275:6:SystemClock_Config	88	static,ignoring_inline_asm
+main.c:158:5:main	64	static,ignoring_inline_asm
+main.c:576:6:HAL_TIM_PeriodElapsedCallback	0	static
+main.c:593:6:Error_Handler	0	static,ignoring_inline_asm

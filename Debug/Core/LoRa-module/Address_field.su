@@ -1,0 +1,24 @@
+Address_field.cpp:3:10:uint32_t value_range(uint32_t, uint32_t, uint32_t)	0	static
+Address_field.cpp:10:10:uint16_t value_range(uint16_t, uint16_t, uint16_t)	0	static
+Address_field.cpp:17:10:uint8_t value_range(uint8_t, uint8_t, uint8_t)	0	static
+Address_field.cpp:25:1:Register::Register(uint16_t, uint8_t, uint8_t)	8	static
+Address_field.cpp:43:10:uint16_t Register::address()	0	static
+Address_field.cpp:46:9:uint8_t Register::bit_count()	0	static
+Address_field.cpp:49:9:uint8_t Register::bit_bias()	0	static
+Address_field.cpp:52:10:uint32_t Register::mask()	0	static
+Address_field.cpp:56:6:bool operator==(const Register&, const Register&)	0	static
+Address_field.cpp:67:6:bool operator!=(const Register&, const Register&)	0	static
+Address_field.cpp:73:1:Address_field::Address_field(Register*, uint8_t, bool, char, uint32_t, uint32_t, uint32_t*, uint32_t)	16	static
+Address_field.cpp:78:6:bool Address_field::init_address_field(Register*, uint8_t, bool, char, uint32_t, uint32_t, uint32_t*, uint32_t)	20	static
+Address_field.cpp:103:10:uint32_t Address_field::get_value(uint8_t*, int)	16	static
+Address_field.cpp:121:6:bool Address_field::set_value(uint32_t, uint8_t*, int)	16	static
+Address_field.cpp:145:11:Register* Address_field::get_registers()	0	static
+Address_field.cpp:148:9:uint8_t Address_field::get_reg_count()	0	static
+Address_field.cpp:151:10:uint16_t Address_field::get_max_address()	0	static
+Address_field.cpp:154:10:uint32_t Address_field::get_min_value()	0	static
+Address_field.cpp:157:10:uint32_t Address_field::get_max_value()	0	static
+Address_field.cpp:160:11:uint32_t* Address_field::get_reserved_value()	0	static
+Address_field.cpp:163:10:uint32_t Address_field::get_reserv_count()	0	static
+Address_field.cpp:166:6:char Address_field::get_mode()	0	static
+Address_field.cpp:170:6:bool operator==(const Address_field&, const Address_field&)	24	static
+Address_field.cpp:193:6:bool operator!=(const Address_field&, const Address_field&)	24	static

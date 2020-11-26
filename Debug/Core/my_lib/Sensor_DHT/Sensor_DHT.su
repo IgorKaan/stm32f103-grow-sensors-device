@@ -1,0 +1,10 @@
+Sensor_DHT.c:10:14:DHT_init	32	static
+Sensor_DHT.c:27:8:DHT_begin	24	static
+Sensor_DHT.c:39:8:DHT_check_sensor	352	static
+Sensor_DHT.c:142:8:DHT_check_result	0	static
+Sensor_DHT.c:147:7:DHT_get_temperature	24	static
+Sensor_DHT.c:178:7:DHT_get_humidity	16	static
+Sensor_DHT.c:196:6:DHT_pin_pull_up	24	static
+Sensor_DHT.c:220:6:DHT_pin_output	32	static
+Sensor_DHT.c:256:8:DHT_check_pin	8	static
+Sensor_DHT.c:265:10:DHT_check_pulse	24	static
