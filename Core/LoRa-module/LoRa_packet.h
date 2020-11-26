@@ -3,7 +3,7 @@
 
 #include <main.h>
 #include <LoRa_module/LoRa_packet_data.h>
-
+#include <vector>
 
 class LoRa_packet {
 private:
@@ -17,7 +17,7 @@ public:
     LoRa_packet(uint8_t* data, uint8_t len, bool crc_err=false, uint8_t rssi=0, float snr=0);
     ~LoRa_packet();
     void set_packet(uint8_t* data, uint8_t len, bool crc_err=false, uint8_t rssi=0, float snr=0);
-
+    std::vector<uint8_t> get_data();
     uint8_t get_data(int num);
     uint8_t get_len();
     bool get_crc_error();

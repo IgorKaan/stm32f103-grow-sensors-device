@@ -1,0 +1,10 @@
+Exchange_packet.cpp:3:1:Exchange_packet::Exchange_packet()	16	static
+Exchange_packet.cpp:11:1:Exchange_packet::Exchange_packet(const Exchange_packet&)	24	static
+Exchange_packet.cpp:18:1:Exchange_packet::~Exchange_packet()	16	static
+Exchange_packet.cpp:23:6:void Exchange_packet::creat_packet(uint8_t, uint8_t)	24	static
+Exchange_packet.cpp:73:6:void Exchange_packet::clear_packet()	16	static
+Exchange_packet.cpp:77:6:void Exchange_packet::set_setting(uint8_t)	0	static
+Exchange_packet.cpp:82:9:uint8_t Exchange_packet::get_setting() const	0	static
+Exchange_packet.cpp:86:22:std::vector<unsigned char> Exchange_packet::get_packet() const	48	static
+Exchange_packet.cpp:92:6:void Exchange_packet::set_packet(std::vector<unsigned char>)	24	static
+Exchange_packet.cpp:99:24:Exchange_packet& Exchange_packet::operator=(const Exchange_packet&)	24	static

@@ -24,8 +24,6 @@ Core/my_lib/LoRa_module/LoRa_main_file.o: \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h \
- ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h \
- ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
@@ -33,7 +31,10 @@ Core/my_lib/LoRa_module/LoRa_main_file.o: \
  /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/LoRa-module/Address_field.h \
  /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/LoRa-module/LoRa_register_data.h \
  /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/LoRa-module/LoRa_packet.h \
- /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/my_lib/LoRa_module/LoRa_packet_data.h
+ /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/my_lib/LoRa_module/LoRa_packet_data.h \
+ /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/LoRa_contact_data/LoRa_contact_data.h \
+ /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Packet_analyzer/Packet_analyzer.h \
+ /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Exchange_packet/Exchange_packet.h
 
 /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/LoRa-module/LoRa.h:
 
@@ -85,10 +86,6 @@ Core/my_lib/LoRa_module/LoRa_main_file.o: \
 
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h:
 
-../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h:
-
-../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h:
-
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h:
 
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h:
@@ -104,3 +101,9 @@ Core/my_lib/LoRa_module/LoRa_main_file.o: \
 /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/LoRa-module/LoRa_packet.h:
 
 /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/my_lib/LoRa_module/LoRa_packet_data.h:
+
+/home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/LoRa_contact_data/LoRa_contact_data.h:
+
+/home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Packet_analyzer/Packet_analyzer.h:
+
+/home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Exchange_packet/Exchange_packet.h:

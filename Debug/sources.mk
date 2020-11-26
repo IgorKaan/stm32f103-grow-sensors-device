@@ -29,15 +29,16 @@ CPP_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
+Core/Exchange_packet \
 Core/LoRa-module \
+Core/LoRa_contact_data \
+Core/Packet_analyzer \
 Core/Sensor_BME280 \
 Core/Sensor_TSL2561 \
 Core/Src \
 Core/Startup \
-Core/my_lib/DelayDWT \
 Core/my_lib/GrowTimer \
 Core/my_lib/LoRa_module \
-Core/my_lib/Sensor_DHT \
 Drivers/STM32F1xx_HAL_Driver/Src \
 Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 \
 Middlewares/Third_Party/FreeRTOS/Source \

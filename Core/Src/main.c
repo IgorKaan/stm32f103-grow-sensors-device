@@ -29,7 +29,8 @@
 #include <bme280.h>
 #include <LoRa_module/LoRa_main_file.h>
 #include <GrowTimer/GrowTimer_LoRa_module.h>
-#include <Sensor_DHT/Sensor_DHT.h>
+#include <GrowTimer/GrowTimer_sensor.h>
+//#include <LoRa_contact_data.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,8 +51,6 @@
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
 
-RTC_HandleTypeDef hrtc;
-
 SPI_HandleTypeDef hspi1;
 
 /* Definitions for Task01 */
@@ -65,29 +64,39 @@ const osThreadAttr_t Task01_attributes = {
 osThreadId_t Task02Handle;
 const osThreadAttr_t Task02_attributes = {
   .name = "Task02",
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityNormal,
   .stack_size = 128 * 4
 };
 /* Definitions for Task03 */
 osThreadId_t Task03Handle;
 const osThreadAttr_t Task03_attributes = {
   .name = "Task03",
-  .priority = (osPriority_t) osPriorityLow,
-  .stack_size = 128 * 4
+  .priority = (osPriority_t) osPriorityHigh,
+  .stack_size = 512 * 4
 };
 /* USER CODE BEGIN PV */
-uint8_t result;
-												// TSL2561
-typedef struct {
-	uint16_t lux;
-	uint16_t temperature;
-	uint16_t humidity;
-	uint16_t pressure;
-	uint16_t CO2;
-	uint16_t TVOC;
-} SensorsDataTypeDef;
 
-SensorsDataTypeDef sensors_data = {0,0,0,0};
+												// TSL2561
+//typedef struct {
+//	uint16_t lux;
+//	uint16_t temperature;
+//	uint16_t humidity;
+//	uint16_t pressure;
+//	uint16_t CO2;
+//	uint16_t TVOC;
+//} SensorsDataTypeDef;
+
+SensorsDataTypeDef sensors_data;
+LoRa_sensor illumination_sensor;
+
+struct LoRa_module lora_module = {
+		.my_adr = {0,8,1},
+		.esp_adr = {0xFF,0xFF,0xFF},
+		.state_regist=1,
+		.num_packet=0,
+		.amt_sensors=1,
+		.sensors = &illumination_sensor};
+uint8_t result;
 
 unsigned  char time = 2;
 bool gain = 0;
@@ -113,7 +122,6 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI1_Init(void);
-static void MX_RTC_Init(void);
 void StartTask01(void *argument);
 void StartTask02(void *argument);
 void StartTask03(void *argument);
@@ -143,9 +151,7 @@ int8_t user_i2c_write(uint8_t id, uint8_t reg_addr, uint8_t *data, uint16_t len)
   buf = malloc(len +1);
   buf[0] = reg_addr;
   memcpy(buf +1, data, len);
-
   if(HAL_I2C_Master_Transmit(&hi2c1, (id << 1), (uint8_t*)buf, len + 1, HAL_MAX_DELAY) != HAL_OK) return -1;
-
   free(buf);
   return 0;
 }
@@ -184,10 +190,9 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_SPI1_Init();
-  MX_RTC_Init();
   /* USER CODE BEGIN 2 */
   LoRa_init(&hspi1);
-  result = LoRa_begin(BAND, true, 14, 11, 125E3, 0x4A);
+  result = LoRa_begin(BAND, true, 14, 7, 250E3, 0x4A);
   if(result == 0) {
 	  HAL_GPIO_WritePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin, GPIO_PIN_SET);
 	  HAL_GPIO_WritePin(LED2_PIN_GPIO_Port, LED2_PIN_Pin, GPIO_PIN_SET);
@@ -204,6 +209,10 @@ int main(void)
 	  }
   }
 
+  lora_sensor_init(&illumination_sensor, 6 , 0);
+
+  //lora_module_introduce(&lora_module);
+  unsigned  char time = 2;
   TSL2561_setTiming_ms (gain, time, & ms);
   TSL2561_setPowerUp ();
 
@@ -276,15 +285,13 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -300,12 +307,6 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC;
-  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
   }
@@ -342,63 +343,6 @@ static void MX_I2C1_Init(void)
   /* USER CODE BEGIN I2C1_Init 2 */
 
   /* USER CODE END I2C1_Init 2 */
-
-}
-
-/**
-  * @brief RTC Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_RTC_Init(void)
-{
-
-  /* USER CODE BEGIN RTC_Init 0 */
-
-  /* USER CODE END RTC_Init 0 */
-
-  RTC_TimeTypeDef sTime = {0};
-  RTC_DateTypeDef DateToUpdate = {0};
-
-  /* USER CODE BEGIN RTC_Init 1 */
-
-  /* USER CODE END RTC_Init 1 */
-  /** Initialize RTC Only
-  */
-  hrtc.Instance = RTC;
-  hrtc.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
-  hrtc.Init.OutPut = RTC_OUTPUTSOURCE_ALARM;
-  if (HAL_RTC_Init(&hrtc) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /* USER CODE BEGIN Check_RTC_BKUP */
-
-  /* USER CODE END Check_RTC_BKUP */
-
-  /** Initialize RTC and set the Time and Date
-  */
-  sTime.Hours = 0x0;
-  sTime.Minutes = 0x0;
-  sTime.Seconds = 0x0;
-
-  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  DateToUpdate.WeekDay = RTC_WEEKDAY_MONDAY;
-  DateToUpdate.Month = RTC_MONTH_JANUARY;
-  DateToUpdate.Date = 0x1;
-  DateToUpdate.Year = 0x0;
-
-  if (HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BCD) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN RTC_Init 2 */
-
-  /* USER CODE END RTC_Init 2 */
 
 }
 
@@ -513,6 +457,7 @@ void StartTask01(void *argument)
 		double lux;
 		TSL2561_getLux(gain, ms, data0, data1, &lux);
 		sensors_data.lux = lux;
+		lora_sensor_set_data(&illumination_sensor,(float)lux);
 	}
 	osDelay(1000);
   }
@@ -560,7 +505,9 @@ void StartTask03(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(10000);
+	//lora_module_introduce(&lora_module, &sensors_data);
+	lora_module_send_packet_read_data(&lora_module);
+    osDelay(1000);
   }
   /* USER CODE END StartTask03 */
 }

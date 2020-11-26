@@ -8,6 +8,15 @@
 #include <GrowTimer/GrowTimer_sensor.h>
 #include <GrowTimer/GrowTimer_device.h>
 
+typedef struct {
+	uint16_t lux;
+	uint16_t temperature;
+	uint16_t humidity;
+	uint16_t pressure;
+	uint16_t CO2;
+	uint16_t TVOC;
+} SensorsDataTypeDef;
+
 struct LoRa_module {
 	uint8_t my_adr[3];
 	uint8_t esp_adr[3];
@@ -20,7 +29,7 @@ struct LoRa_module {
 	uint8_t setting_sensors;
 	uint8_t setting_devices;
 
-	struct LoRa_sensor* sensors;
+	LoRa_sensor* sensors;
 	uint8_t amt_sensors;
 	struct LoRa_device* devices;
 	uint8_t amt_devices;
@@ -28,12 +37,12 @@ struct LoRa_module {
 	struct lora_packet packet;
 };
 
-struct LoRa_module lora_module_init(struct LoRa_sensor* sensors, uint8_t amt_sensors,
+struct LoRa_module lora_module_init(LoRa_sensor* sensors, uint8_t amt_sensors,
 		struct LoRa_device* devices, uint8_t amt_devices, GPIO_TypeDef* ledIN_port,
 		uint16_t ledIN_pin, GPIO_TypeDef* ledOUT_port, uint16_t ledOUT_pin,
 		GPIO_TypeDef* ledREG_port, uint16_t ledREG_pin);
 
-void lora_module_introduce(struct LoRa_module* module);
+void lora_module_introduce(struct LoRa_module* module, SensorsDataTypeDef* sData);
 
 //void lora_module_send_data_sensors(struct LoRa_module* module);
 //void lora_module_send_data_devices(struct LoRa_module* module);

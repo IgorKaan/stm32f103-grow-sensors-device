@@ -20,13 +20,14 @@ enum Type_sensor_t {
 	Indicator_nYVOC
 };
 
-struct LoRa_sensor {
+typedef struct {
 	enum Type_sensor_t type;
 	uint8_t id;
 	uint32_t data;
-};
+	float idata;
+} LoRa_sensor;
 
-void lora_sensor_init(struct LoRa_sensor* sensor, enum Type_sensor_t type, uint8_t id);
-void lora_sensor_set_data(struct LoRa_sensor* sensor, float value);
+void lora_sensor_init(LoRa_sensor* sensor, enum Type_sensor_t type, uint8_t id);
+void lora_sensor_set_data(LoRa_sensor* sensor, float value);
 
 #endif // __GROWTIMER_SENSOR_H__

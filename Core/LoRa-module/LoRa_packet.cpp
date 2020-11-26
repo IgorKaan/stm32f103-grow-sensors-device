@@ -13,7 +13,12 @@ LoRa_packet::~LoRa_packet() {
         _len = 0;
     }
 }
-
+std::vector<uint8_t> LoRa_packet::get_data() {
+    std::vector<uint8_t> data;
+    for(int i = 0; i < _len; ++i)
+        data.push_back(_data[i]);
+    return data;
+}
 void LoRa_packet::set_packet(uint8_t* data, uint8_t len, bool crc_error, uint8_t rssi, float snr) {
     if(_data != nullptr) {
         delete[] _data;

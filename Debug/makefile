@@ -13,15 +13,16 @@ RM := rm -rf
 -include Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/subdir.mk
 -include Middlewares/Third_Party/FreeRTOS/Source/subdir.mk
 -include Drivers/STM32F1xx_HAL_Driver/Src/subdir.mk
--include Core/my_lib/Sensor_DHT/subdir.mk
 -include Core/my_lib/LoRa_module/subdir.mk
 -include Core/my_lib/GrowTimer/subdir.mk
--include Core/my_lib/DelayDWT/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
 -include Core/Sensor_TSL2561/subdir.mk
 -include Core/Sensor_BME280/subdir.mk
+-include Core/Packet_analyzer/subdir.mk
+-include Core/LoRa_contact_data/subdir.mk
 -include Core/LoRa-module/subdir.mk
+-include Core/Exchange_packet/subdir.mk
 -include subdir.mk
 -include objects.mk
 

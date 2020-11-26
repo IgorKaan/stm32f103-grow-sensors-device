@@ -1,4 +1,5 @@
 #include "LoRa.h"
+#include <LoRa_contact_data.h>
 extern class LoRa_class LoRa;
 
 extern "C" {

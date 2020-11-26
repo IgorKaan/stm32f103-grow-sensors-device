@@ -12,7 +12,7 @@ bool lora_module_my_packet(struct LoRa_module* module);
 uint8_t lora_module_reciv_packet_connect(struct LoRa_module* module);
 void lora_module_send_packet_connect(struct LoRa_module* module, bool send_sensor);
 void lora_module_send_packet_read_data(struct LoRa_module* module);
-void lora_module_send_regist_packet(struct LoRa_module* module);
+void lora_module_send_regist_packet(struct LoRa_module* module, SensorsDataTypeDef* sData);
 bool lora_module_reciv_regist_packet(struct LoRa_module* module);
 bool lora_module_reciv_packet_use_device(struct LoRa_module* module);
 
@@ -149,7 +149,7 @@ void lora_module_send_packet_read_data(struct LoRa_module* module) {
     }
 }
 
-void lora_module_send_regist_packet(struct LoRa_module* module) {
+void lora_module_send_regist_packet(struct LoRa_module* module, SensorsDataTypeDef* sData) {
 	uint8_t amt_module = module->amt_sensors + module->amt_devices;
 	packet_set_len(&(module->packet), (11 + 4 + 2 * amt_module));
     for(int i = 0; i < 3; ++i) {
@@ -168,10 +168,14 @@ void lora_module_send_regist_packet(struct LoRa_module* module) {
     // отправка команды представления
 	packet_data_add(&(module->packet), 0x00);
     // отправка id
-	packet_data_add(&(module->packet), 0x21);
-	packet_data_add(&(module->packet), 0x23);
-	packet_data_add(&(module->packet), 0x45);
-	packet_data_add(&(module->packet), 0x43);
+//	packet_data_add(&(module->packet), 0x1);
+//	packet_data_add(&(module->packet), 0x2);
+//	packet_data_add(&(module->packet), 0x4);
+//	packet_data_add(&(module->packet), 0x4);
+		packet_data_add(&(module->packet), (uint8_t)sData->lux);
+		packet_data_add(&(module->packet), 0x2);
+		packet_data_add(&(module->packet), 0x4);
+		packet_data_add(&(module->packet), 0x4);
     // отправка отправка количества модулей
 	packet_data_add(&(module->packet), amt_module);
     // отправка данных каждого модуля
@@ -205,7 +209,7 @@ bool lora_module_reciv_regist_packet(struct LoRa_module* module) {
             else if(module->packet._data[9] == 0x01) {
             	lora_module_create_adr(module);
             	HAL_Delay(((uint32_t)(HAL_GetTick()) & 0x1FFF) + 1000); // ожидание от 1 до ~9 секунд
-            	lora_module_send_regist_packet(module);
+            	//lora_module_send_regist_packet(module);
                 return true;
             }
         }
@@ -242,7 +246,7 @@ bool lora_module_reciv_packet_use_device(struct LoRa_module* module) {
 }
 
 // public
-struct LoRa_module lora_module_init(struct LoRa_sensor* sensors, uint8_t amt_sensors,
+struct LoRa_module lora_module_init(LoRa_sensor* sensors, uint8_t amt_sensors,
 		struct LoRa_device* devices, uint8_t amt_devices, GPIO_TypeDef* ledIN_port,
 		uint16_t ledIN_pin, GPIO_TypeDef* ledOUT_port, uint16_t ledOUT_pin,
 		GPIO_TypeDef* ledREG_port, uint16_t ledREG_pin) {
@@ -267,8 +271,8 @@ struct LoRa_module lora_module_init(struct LoRa_sensor* sensors, uint8_t amt_sen
 	return module;
 }
 
-void lora_module_introduce(struct LoRa_module* module) {
-	lora_module_send_regist_packet(module);
+void lora_module_introduce(struct LoRa_module* module, SensorsDataTypeDef* sData) {
+	lora_module_send_regist_packet(module, sData);
 }
 
 bool lora_module_work(struct LoRa_module* module) {

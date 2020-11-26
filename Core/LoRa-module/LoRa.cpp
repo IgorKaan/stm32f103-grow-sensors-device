@@ -162,6 +162,9 @@ uint8_t LoRa_class::mode_TX(bool set_dio) {
         field_set(Dio0Mapping, 1);
     return set_mode(MODE_TX);
 }
+uint8_t LoRa_class::mode_FSTX() {
+    return set_mode(MODE_FSTX);
+}
 // Режим непрерывного приёма
 uint8_t LoRa_class::mode_RX_continuous(bool set_dio) {
     if (set_dio & ((_dio0_pin != 0) || (_dio1_pin != 0))) {

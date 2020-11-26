@@ -48,6 +48,7 @@ public:
     uint8_t mode_sleep();
     uint8_t mode_STDBY();
     uint8_t mode_TX(bool set_dio=true);
+    uint8_t mode_FSTX(); // Подготовки к отправке
     uint8_t mode_RX_continuous(bool set_dio=true);
     uint8_t mode_RX_single(bool set_dio=true);
     uint8_t mode_CAD(bool set_dio=true);
