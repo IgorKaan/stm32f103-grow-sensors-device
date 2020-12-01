@@ -53,6 +53,8 @@ I2C_HandleTypeDef hi2c1;
 
 SPI_HandleTypeDef hspi1;
 
+TIM_HandleTypeDef htim2;
+
 /* Definitions for Task01 */
 osThreadId_t Task01Handle;
 const osThreadAttr_t Task01_attributes = {
@@ -122,6 +124,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI1_Init(void);
+static void MX_TIM2_Init(void);
 void StartTask01(void *argument);
 void StartTask02(void *argument);
 void StartTask03(void *argument);
@@ -190,6 +193,7 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_SPI1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   LoRa_init(&hspi1);
   result = LoRa_begin(BAND, true, 14, 7, 250E3, 0x4A);
@@ -223,6 +227,7 @@ int main(void)
   dev.settings.osr_t = BME280_OVERSAMPLING_2X;
   dev.settings.filter = BME280_FILTER_COEFF_16;
   rslt = bme280_set_sensor_settings(BME280_OSR_PRESS_SEL | BME280_OSR_TEMP_SEL | BME280_OSR_HUM_SEL | BME280_FILTER_SEL, &dev);
+  rslt = bme280_set_sensor_mode(BME280_NORMAL_MODE, &dev);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -385,6 +390,51 @@ static void MX_SPI1_Init(void)
 }
 
 /**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 72;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 65535;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -477,8 +527,8 @@ void StartTask02(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	rslt = bme280_set_sensor_mode(BME280_NORMAL_MODE, &dev);
-	dev.delay_ms(40);
+	//rslt = bme280_set_sensor_mode(BME280_NORMAL_MODE, &dev);
+	//dev.delay_ms(40);
 	rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, &dev);
 	if(rslt == BME280_OK)
 	{
@@ -486,7 +536,7 @@ void StartTask02(void *argument)
 		sensors_data.humidity = comp_data.humidity / 1024.0;           /* %   */
 		sensors_data.pressure = comp_data.pressure / 10000.0 / 1.333;  /* hPa or mmhg */
 	}
-	rslt = bme280_set_sensor_mode(BME280_SLEEP_MODE, &dev);
+	//rslt = bme280_set_sensor_mode(BME280_SLEEP_MODE, &dev);
     osDelay(1000);
   }
   /* USER CODE END StartTask02 */
