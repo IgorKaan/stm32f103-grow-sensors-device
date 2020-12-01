@@ -34,7 +34,9 @@ Core/LoRa-module \
 Core/LoRa_contact_data \
 Core/Packet_analyzer \
 Core/Sensor_BME280 \
+Core/Sensor_CCS811 \
 Core/Sensor_TSL2561 \
+Core/Sensor_test \
 Core/Src \
 Core/Startup \
 Core/my_lib/GrowTimer \

@@ -45,7 +45,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-
+extern TIM_HandleTypeDef htim3;
 /* USER CODE END Variables */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -61,12 +61,17 @@ unsigned long getRunTimeCounterValue(void);
 /* Functions needed when configGENERATE_RUN_TIME_STATS is on */
 __weak void configureTimerForRunTimeStats(void)
 {
-
+	HAL_TIM_Base_Start(&htim3);
 }
 
 __weak unsigned long getRunTimeCounterValue(void)
 {
-return 0;
+	static unsigned long counter = 0;
+
+	counter += __HAL_TIM_GET_COUNTER(&htim3);
+	__HAL_TIM_SET_COUNTER(&htim3, 0);
+
+	return counter;
 }
 /* USER CODE END 1 */
 

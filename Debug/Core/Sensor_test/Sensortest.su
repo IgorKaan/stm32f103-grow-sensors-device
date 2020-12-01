@@ -1,0 +1,13 @@
+Sensortest.cpp:24:1:Sensor_test::~Sensor_test()	0	static
+shared_ptr_base.h:466:7:std::_Sp_counted_deleter<_Ptr, _Deleter, _Alloc, _Lp>::~_Sp_counted_deleter() [with _Ptr = Sensor_test*; _Deleter = std::__shared_ptr<Sensor_test, (__gnu_cxx::_Lock_policy)0>::_Deleter<std::allocator<Sensor_test> >; _Alloc = std::allocator<Sensor_test>; __gnu_cxx::_Lock_policy _Lp = (__gnu_cxx::_Lock_policy)0]	0	static
+shared_ptr_base.h:481:7:void* std::_Sp_counted_deleter<_Ptr, _Deleter, _Alloc, _Lp>::_M_get_deleter(const std::type_info&) [with _Ptr = Sensor_test*; _Deleter = std::__shared_ptr<Sensor_test, (__gnu_cxx::_Lock_policy)0>::_Deleter<std::allocator<Sensor_test> >; _Alloc = std::allocator<Sensor_test>; __gnu_cxx::_Lock_policy _Lp = (__gnu_cxx::_Lock_policy)0]	0	static
+Sensortest.cpp:24:1:virtual Sensor_test::~Sensor_test()	8	static
+shared_ptr_base.h:466:7:std::_Sp_counted_deleter<_Ptr, _Deleter, _Alloc, _Lp>::~_Sp_counted_deleter() [with _Ptr = Sensor_test*; _Deleter = std::__shared_ptr<Sensor_test, (__gnu_cxx::_Lock_policy)0>::_Deleter<std::allocator<Sensor_test> >; _Alloc = std::allocator<Sensor_test>; __gnu_cxx::_Lock_policy _Lp = (__gnu_cxx::_Lock_policy)0]	8	static
+shared_ptr_base.h:473:7:void std::_Sp_counted_deleter<_Ptr, _Deleter, _Alloc, _Lp>::_M_destroy() [with _Ptr = Sensor_test*; _Deleter = std::__shared_ptr<Sensor_test, (__gnu_cxx::_Lock_policy)0>::_Deleter<std::allocator<Sensor_test> >; _Alloc = std::allocator<Sensor_test>; __gnu_cxx::_Lock_policy _Lp = (__gnu_cxx::_Lock_policy)0]	0	static
+shared_ptr_base.h:307:5:void std::_Sp_counted_base<_Lp>::_M_release() [with __gnu_cxx::_Lock_policy _Lp = (__gnu_cxx::_Lock_policy)0]	8	static
+shared_ptr_base.h:469:7:void std::_Sp_counted_deleter<_Ptr, _Deleter, _Alloc, _Lp>::_M_dispose() [with _Ptr = Sensor_test*; _Deleter = std::__shared_ptr<Sensor_test, (__gnu_cxx::_Lock_policy)0>::_Deleter<std::allocator<Sensor_test> >; _Alloc = std::allocator<Sensor_test>; __gnu_cxx::_Lock_policy _Lp = (__gnu_cxx::_Lock_policy)0]	8	static
+Sensortest.cpp:19:1:Sensor_test::Sensor_test()	0	static
+Sensortest.cpp:29:6:void Sensor_test::increment()	0	static
+Sensortest.cpp:41:17:void test_func()	8	static
+Sensortest.cpp:51:1:cpp)	16	static
+Sensortest.cpp:51:1:cpp)	16	static

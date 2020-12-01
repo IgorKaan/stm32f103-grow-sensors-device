@@ -34,9 +34,12 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3/portmacro.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h \
- /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Sensor_TSL2561/Sensor_TSL2561.h \
+ /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Sensor_test/Sensortest.h \
+ /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Sensor_test/cpp_main.cpp \
+ /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Sensor_test/Sensortest.h \
  /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Sensor_BME280/bme280.h \
  /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Sensor_BME280/bme280_defs.h \
+ /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Sensor_TSL2561/Sensor_TSL2561.h \
  /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/my_lib/LoRa_module/LoRa_main_file.h \
  /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/my_lib/LoRa_module/LoRa_packet_data.h \
  /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/my_lib/GrowTimer/GrowTimer_LoRa_module.h \
@@ -116,11 +119,17 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 
 ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h:
 
-/home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Sensor_TSL2561/Sensor_TSL2561.h:
+/home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Sensor_test/Sensortest.h:
+
+/home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Sensor_test/cpp_main.cpp:
+
+/home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Sensor_test/Sensortest.h:
 
 /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Sensor_BME280/bme280.h:
 
 /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Sensor_BME280/bme280_defs.h:
+
+/home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/Sensor_TSL2561/Sensor_TSL2561.h:
 
 /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/my_lib/LoRa_module/LoRa_main_file.h:
 

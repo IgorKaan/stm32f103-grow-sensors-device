@@ -1,2 +1,2 @@
-GrowTimer_sensor.c:9:6:lora_sensor_init	4	static
+GrowTimer_sensor.c:9:6:lora_sensor_init	0	static
 GrowTimer_sensor.c:16:6:lora_sensor_set_data	0	static

@@ -91,7 +91,7 @@ std::vector<uint8_t> Exchange_packet::get_packet() const {
 }
 void Exchange_packet::set_packet(std::vector<uint8_t> pack) {
     creat_packet(pack.size(), 0);
-    for (int i = 0; i < pack.size(); ++i)
+    for (unsigned int i = 0; i < pack.size(); ++i)
         packet_data[i] = pack[i];
     creat_packet(pack.size(), packet_data[6]);
 }

@@ -17,7 +17,9 @@ RM := rm -rf
 -include Core/my_lib/GrowTimer/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
+-include Core/Sensor_test/subdir.mk
 -include Core/Sensor_TSL2561/subdir.mk
+-include Core/Sensor_CCS811/subdir.mk
 -include Core/Sensor_BME280/subdir.mk
 -include Core/Packet_analyzer/subdir.mk
 -include Core/LoRa_contact_data/subdir.mk

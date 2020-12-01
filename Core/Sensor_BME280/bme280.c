@@ -1026,20 +1026,20 @@ static uint32_t compensate_pressure(const struct bme280_uncomp_data *uncomp_data
 
 	var1 = ((int64_t)calib_data->t_fine) - 128000;
 	var2 = var1 * var1 * (int64_t)calib_data->dig_P6;
-	var2 = var2 + ((var1 * (int64_t)calib_data->dig_P5) * 131072);
-	var2 = var2 + (((int64_t)calib_data->dig_P4) * 34359738368);
-	var1 = ((var1 * var1 * (int64_t)calib_data->dig_P3) / 256) + ((var1 * ((int64_t)calib_data->dig_P2) * 4096));
-	var3 = ((int64_t)1) * 140737488355328;
-	var1 = (var3 + var1) * ((int64_t)calib_data->dig_P1) / 8589934592;
+	var2 = var2 + ((var1 * (int64_t)calib_data->dig_P5) << 17);
+	var2 = var2 + (((int64_t)calib_data->dig_P4) << 35);
+	var1 = ((var1 * var1 * (int64_t)calib_data->dig_P3) >> 8) + ((var1 * ((int64_t)calib_data->dig_P2) << 12));
+	var3 = ((int64_t)1) << 47;
+	var1 = (var3 + var1) * ((int64_t)calib_data->dig_P1) >> 33;
 
 	/* To avoid divide by zero exception */
 	if (var1 != 0) {
 		var4 = 1048576 - uncomp_data->pressure;
-		var4 = (((var4 * 2147483648) - var2) * 3125) / var1;
-		var1 = (((int64_t)calib_data->dig_P9) * (var4 / 8192) * (var4 / 8192)) / 33554432;
-		var2 = (((int64_t)calib_data->dig_P8) * var4) / 524288;
-		var4 = ((var4 + var1 + var2) / 256) + (((int64_t)calib_data->dig_P7) * 16);
-		pressure = (uint32_t)(((var4 / 2) * 100) / 128);
+		var4 = (((var4 << 31) - var2) * 3125) / var1;
+		var1 = (((int64_t)calib_data->dig_P9) * (var4 >> 13) * (var4 >> 13)) >> 25;
+		var2 = (((int64_t)calib_data->dig_P8) * var4) >> 19;
+		var4 = ((var4 + var1 + var2) >> 8) + (((int64_t)calib_data->dig_P7) << 4);
+		pressure = (uint32_t)(((var4 >> 1) * 100) >> 7);
 
 		if (pressure < pressure_min)
 			pressure = pressure_min;
@@ -1117,20 +1117,20 @@ static uint32_t compensate_humidity(const struct bme280_uncomp_data *uncomp_data
 	uint32_t humidity_max = 102400;
 
 	var1 = calib_data->t_fine - ((int32_t)76800);
-	var2 = (int32_t)(uncomp_data->humidity * 16384);
-	var3 = (int32_t)(((int32_t)calib_data->dig_H4) * 1048576);
+	var2 = (int32_t)(uncomp_data->humidity << 14);
+	var3 = (int32_t)(((int32_t)calib_data->dig_H4) << 20);
 	var4 = ((int32_t)calib_data->dig_H5) * var1;
-	var5 = (((var2 - var3) - var4) + (int32_t)16384) / 32768;
-	var2 = (var1 * ((int32_t)calib_data->dig_H6)) / 1024;
-	var3 = (var1 * ((int32_t)calib_data->dig_H3)) / 2048;
-	var4 = ((var2 * (var3 + (int32_t)32768)) / 1024) + (int32_t)2097152;
-	var2 = ((var4 * ((int32_t)calib_data->dig_H2)) + 8192) / 16384;
+	var5 = (((var2 - var3) - var4) + (int32_t)16384) >> 15;
+	var2 = (var1 * ((int32_t)calib_data->dig_H6)) >> 10;
+	var3 = (var1 * ((int32_t)calib_data->dig_H3)) >> 11;
+	var4 = ((var2 * (var3 + (int32_t)32768)) >> 10) + (int32_t)2097152;
+	var2 = ((var4 * ((int32_t)calib_data->dig_H2)) + 8192) >> 14;
 	var3 = var5 * var2;
-	var4 = ((var3 / 32768) * (var3 / 32768)) / 128;
-	var5 = var3 - ((var4 * ((int32_t)calib_data->dig_H1)) / 16);
+	var4 = ((var3 >> 15) * (var3 >> 15)) >> 7;
+	var5 = var3 - ((var4 * ((int32_t)calib_data->dig_H1)) >> 4);
 	var5 = (var5 < 0 ? 0 : var5);
 	var5 = (var5 > 419430400 ? 419430400 : var5);
-	humidity = (uint32_t)(var5 / 4096);
+	humidity = (uint32_t)(var5 >> 12);
 
 	if (humidity > humidity_max)
 		humidity = humidity_max;

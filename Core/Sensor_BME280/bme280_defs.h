@@ -312,9 +312,9 @@ struct bme280_data {
 struct bme280_uncomp_data {
 	/*! un-compensated pressure */
 	uint32_t pressure;
-	/*! un-compensated temperature */
+//	/*! un-compensated temperature */
 	uint32_t temperature;
-	/*! un-compensated humidity */
+//	/*! un-compensated humidity */
 	uint32_t humidity;
 };
 

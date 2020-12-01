@@ -1,34 +1,36 @@
-LoRa_register.cpp:4:1:LoRa_register::LoRa_register()	32	static
-LoRa_register.cpp:8:1:LoRa_register::LoRa_register(SPI_HandleTypeDef*, GPIO_TypeDef*, uint16_t)	40	static
 LoRa_register.cpp:13:1:LoRa_register::~LoRa_register()	0	static
 LoRa_register.cpp:16:6:void LoRa_register::init(SPI_HandleTypeDef*, GPIO_TypeDef*, uint16_t)	0	static
-LoRa_register.cpp:22:6:void LoRa_register::clear()	16	static
+LoRa_register.cpp:22:6:void LoRa_register::clear()	0	static
+LoRa_register.cpp:4:1:LoRa_register::LoRa_register()	16	static
+LoRa_register.cpp:8:1:LoRa_register::LoRa_register(SPI_HandleTypeDef*, GPIO_TypeDef*, uint16_t)	32	static
 LoRa_register.cpp:29:6:bool LoRa_register::get_send()	0	static
-LoRa_register.cpp:35:22:std::vector<unsigned char> LoRa_register::field_registers(Address_field)	48	static
-LoRa_register.cpp:83:22:std::vector<unsigned char> LoRa_register::check_missing_register(Address_field)	72	static
 LoRa_register.cpp:118:6:bool LoRa_register::check_read(Address_field)	24	static
-LoRa_register.cpp:217:9:uint8_t LoRa_register::register_write(bool)	48	static,ignoring_inline_asm
-LoRa_register.cpp:337:9:uint8_t LoRa_register::_read_register(uint8_t)	32	static,ignoring_inline_asm
-LoRa_register.cpp:340:6:void LoRa_register::_write_register(uint8_t, uint8_t)	24	static,ignoring_inline_asm
 LoRa_register.cpp:343:9:uint8_t LoRa_register::_single_transfer(uint8_t, uint8_t)	32	static,ignoring_inline_asm
-vector.tcc:95:7:) [with _Args = {unsigned char}; _Tp = unsigned char; _Alloc = std::allocator<unsigned char>]	48	static
-LoRa_register.cpp:126:6:bool LoRa_register::check_read(Address_field*, uint8_t, std::vector<unsigned char>*, std::vector<unsigned char>*)	184	static
-LoRa_register.cpp:159:6:bool LoRa_register::check_read(std::vector<Address_field>, std::vector<unsigned char>*, std::vector<unsigned char>*)	184	static
-vector.tcc:394:7:) [with _Args = {const unsigned char&}; _Tp = unsigned char; _Alloc = std::allocator<unsigned char>]	48	static
-LoRa_register.cpp:42:22:std::vector<unsigned char> LoRa_register::field_registers(Address_field*, uint8_t)	144	static
-LoRa_register.cpp:93:22:std::vector<unsigned char> LoRa_register::check_missing_register(Address_field*, uint8_t)	40	static
-LoRa_register.cpp:197:9:uint8_t LoRa_register::register_read(Address_field*, uint8_t, bool)	72	static,ignoring_inline_asm
-LoRa_register.cpp:256:9:uint8_t LoRa_register::set_field_value(Address_field*, uint32_t*, uint8_t)	80	static
-LoRa_register.cpp:299:9:uint8_t LoRa_register::clear_flags(Address_field*, uint8_t, bool)	72	static,ignoring_inline_asm
-LoRa_register.cpp:234:9:uint8_t LoRa_register::register_write(Address_field*, uint8_t, bool, bool)	72	static,ignoring_inline_asm
-LoRa_register.cpp:286:9:uint8_t LoRa_register::get_field_value(Address_field*, uint32_t*, uint8_t, bool)	56	static
-LoRa_register.cpp:62:22:std::vector<unsigned char> LoRa_register::field_registers(std::vector<Address_field>)	160	static
-LoRa_register.cpp:105:22:std::vector<unsigned char> LoRa_register::check_missing_register(std::vector<Address_field>)	48	static
-LoRa_register.cpp:93:22:std::vector<unsigned char> LoRa_register::check_missing_register(Address_field*, uint8_t)	152	static
-LoRa_register.cpp:231:9:uint8_t LoRa_register::register_write(Address_field, bool, bool)	176	static,ignoring_inline_asm
-LoRa_register.cpp:197:9:uint8_t LoRa_register::register_read(Address_field*, uint8_t, bool)	184	static,ignoring_inline_asm
+LoRa_register.cpp:337:9:uint8_t LoRa_register::_read_register(uint8_t)	0	static
+LoRa_register.cpp:340:6:void LoRa_register::_write_register(uint8_t, uint8_t)	0	static
+LoRa_register.cpp:217:9:uint8_t LoRa_register::register_write(bool)	32	static
+stl_vector.h:161:7:std::_Vector_base<_Tp, _Alloc>::~_Vector_base() [with _Tp = unsigned char; _Alloc = std::allocator<unsigned char>]	8	static
+stl_vector.h:1529:7:void std::vector<_Tp, _Alloc>::_M_move_assign(std::vector<_Tp, _Alloc>&&, std::true_type) [with _Tp = unsigned char; _Alloc = std::allocator<unsigned char>]	24	static
+stl_vector.h:1497:7:std::vector<_Tp, _Alloc>::size_type std::vector<_Tp, _Alloc>::_M_check_len(std::vector<_Tp, _Alloc>::size_type, const char*) const [with _Tp = unsigned char; _Alloc = std::allocator<unsigned char>]	8	static
+stl_algobase.h:357:9:static _Tp* std::__copy_move<_IsMove, true, std::random_access_iterator_tag>::__copy_m(const _Tp*, const _Tp*, _Tp*) [with _Tp = unsigned char; bool _IsMove = true]	8	static
+vector.tcc:153:5:std::vector<_Tp, _Alloc>::iterator std::vector<_Tp, _Alloc>::_M_erase(std::vector<_Tp, _Alloc>::iterator) [with _Tp = unsigned char; _Alloc = std::allocator<unsigned char>]	16	static
+vector.tcc:95:7:) [with _Args = {unsigned char}; _Tp = unsigned char; _Alloc = std::allocator<unsigned char>]	32	static
+LoRa_register.cpp:35:22:std::vector<unsigned char> LoRa_register::field_registers(Address_field)	24	static
+LoRa_register.cpp:83:22:std::vector<unsigned char> LoRa_register::check_missing_register(Address_field)	64	static
+LoRa_register.cpp:126:6:bool LoRa_register::check_read(Address_field*, uint8_t, std::vector<unsigned char>*, std::vector<unsigned char>*)	176	static
+LoRa_register.cpp:159:6:bool LoRa_register::check_read(std::vector<Address_field>, std::vector<unsigned char>*, std::vector<unsigned char>*)	168	static
+stl_vector.h:939:7:void std::vector<_Tp, _Alloc>::push_back(const value_type&) [with _Tp = unsigned char; _Alloc = std::allocator<unsigned char>]	32	static
+LoRa_register.cpp:42:22:std::vector<unsigned char> LoRa_register::field_registers(Address_field*, uint8_t)	160	static
+LoRa_register.cpp:93:22:std::vector<unsigned char> LoRa_register::check_missing_register(Address_field*, uint8_t)	32	static
+LoRa_register.cpp:197:9:uint8_t LoRa_register::register_read(Address_field*, uint8_t, bool)	48	static
 LoRa_register.cpp:194:9:uint8_t LoRa_register::register_read(Address_field, bool)	8	static
-LoRa_register.cpp:256:9:uint8_t LoRa_register::set_field_value(Address_field*, uint32_t*, uint8_t)	200	static
+LoRa_register.cpp:256:9:uint8_t LoRa_register::set_field_value(Address_field*, uint32_t*, uint8_t)	80	static
 LoRa_register.cpp:253:9:uint8_t LoRa_register::set_field_value(Address_field, uint32_t)	8	static
-LoRa_register.cpp:296:9:uint8_t LoRa_register::clear_flags(Address_field, bool)	56	static,ignoring_inline_asm
-LoRa_register.cpp:283:9:uint8_t LoRa_register::get_field_value(Address_field, uint32_t*, bool)	160	static
+LoRa_register.cpp:299:9:uint8_t LoRa_register::clear_flags(Address_field*, uint8_t, bool)	56	static
+LoRa_register.cpp:296:9:uint8_t LoRa_register::clear_flags(Address_field, bool)	8	static
+LoRa_register.cpp:286:9:uint8_t LoRa_register::get_field_value(Address_field*, uint32_t*, uint8_t, bool)	48	static
+LoRa_register.cpp:283:9:uint8_t LoRa_register::get_field_value(Address_field, uint32_t*, bool)	16	static
+LoRa_register.cpp:234:9:uint8_t LoRa_register::register_write(Address_field*, uint8_t, bool, bool)	48	static
+LoRa_register.cpp:231:9:uint8_t LoRa_register::register_write(Address_field, bool, bool)	16	static
+LoRa_register.cpp:62:22:std::vector<unsigned char> LoRa_register::field_registers(std::vector<Address_field>)	152	static
+LoRa_register.cpp:105:22:std::vector<unsigned char> LoRa_register::check_missing_register(std::vector<Address_field>)	48	static

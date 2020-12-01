@@ -1,7 +1,7 @@
 LoRa_main_file.cpp:7:6:void LoRa_init(SPI_HandleTypeDef*)	0	static
-LoRa_main_file.cpp:10:9:uint8_t LoRa_field_set_one(Address_field, uint32_t, bool)	40	static
+LoRa_main_file.cpp:10:9:uint8_t LoRa_field_set_one(Address_field, uint32_t, bool)	32	static
 LoRa_main_file.cpp:13:9:uint8_t LoRa_field_set(Address_field*, uint32_t*, uint8_t, bool)	16	static
-LoRa_main_file.cpp:16:9:uint8_t LoRa_field_get_one(Address_field, uint32_t*, bool)	40	static
+LoRa_main_file.cpp:16:9:uint8_t LoRa_field_get_one(Address_field, uint32_t*, bool)	32	static
 LoRa_main_file.cpp:19:9:uint8_t LoRa_field_get(Address_field*, uint32_t*, uint8_t, bool)	16	static
 LoRa_main_file.cpp:22:9:uint8_t LoRa_begin(uint64_t, bool, uint8_t, uint8_t, uint64_t, uint8_t)	48	static
 LoRa_main_file.cpp:25:6:void LoRa_end()	0	static
@@ -20,7 +20,7 @@ LoRa_main_file.cpp:61:9:uint8_t LoRa_set_preamble_length(unsigned int)	0	static
 LoRa_main_file.cpp:64:9:uint8_t LoRa_set_sync_word(uint8_t)	0	static
 LoRa_main_file.cpp:67:9:uint8_t LoRa_crc_enable()	0	static
 LoRa_main_file.cpp:70:9:uint8_t LoRa_crc_disable()	0	static
-LoRa_main_file.cpp:73:20:lora_packet LoRa_receiver_packet(uint8_t, uint32_t, bool, bool)	40	static
+LoRa_main_file.cpp:73:20:lora_packet LoRa_receiver_packet(uint8_t, uint32_t, bool, bool)	32	static
 LoRa_main_file.cpp:76:20:lora_packet LoRa_read_packet_data(bool, bool, bool)	32	static
 LoRa_main_file.cpp:79:9:uint8_t LoRa_packet_rssi()	0	static
 LoRa_main_file.cpp:82:7:float LoRa_packet_snr()	0	static
@@ -31,5 +31,5 @@ LoRa_main_file.cpp:94:6:bool LoRa_packet_end(uint32_t, bool)	0	static
 LoRa_main_file.cpp:98:6:void packet_delete(lora_packet*)	8	static
 LoRa_main_file.cpp:111:6:void packet_init(lora_packet*)	0	static
 LoRa_main_file.cpp:121:6:void packet_set_len(lora_packet*, uint8_t)	16	static
-LoRa_main_file.cpp:129:6:void packet_set_data(lora_packet*, uint8_t*, uint8_t)	24	static
+LoRa_main_file.cpp:129:6:void packet_set_data(lora_packet*, uint8_t*, uint8_t)	16	static
 LoRa_main_file.cpp:135:6:void packet_data_add(lora_packet*, uint8_t)	0	static

@@ -23,10 +23,13 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "Sensortest.h"
+#include <cpp_main.cpp>
+#include <bme280.h>
 #include <stdlib.h>
 #include <string.h>
+//#include "Sensor_CCS811.h"
 #include <Sensor_TSL2561.h>
-#include <bme280.h>
 #include <LoRa_module/LoRa_main_file.h>
 #include <GrowTimer/GrowTimer_LoRa_module.h>
 #include <GrowTimer/GrowTimer_sensor.h>
@@ -53,12 +56,14 @@ I2C_HandleTypeDef hi2c1;
 
 SPI_HandleTypeDef hspi1;
 
+TIM_HandleTypeDef htim3;
+
 /* Definitions for Task01 */
 osThreadId_t Task01Handle;
 const osThreadAttr_t Task01_attributes = {
   .name = "Task01",
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 128 * 4
+  .stack_size = 256 * 4
 };
 /* Definitions for Task02 */
 osThreadId_t Task02Handle;
@@ -67,20 +72,19 @@ const osThreadAttr_t Task02_attributes = {
   .priority = (osPriority_t) osPriorityNormal,
   .stack_size = 128 * 4
 };
-/* Definitions for Task03 */
-osThreadId_t Task03Handle;
-const osThreadAttr_t Task03_attributes = {
-  .name = "Task03",
-  .priority = (osPriority_t) osPriorityHigh,
-  .stack_size = 512 * 4
-};
 /* USER CODE BEGIN PV */
-
+uint32_t cnt_task_1, cnt_task_2, cnt_task_3 = 0;
+uint8_t ccs811_ID = 0;
+uint8_t ctrl_a, ctrl_b;
+uint32_t CO2_tVOC_res = 0;
+uint16_t CO2 = 0;
+uint16_t tVOC = 0;
+uint32_t pressure = 0;
 												// TSL2561
 //typedef struct {
-//	uint16_t lux;
-//	uint16_t temperature;
-//	uint16_t humidity;
+//	float lux;
+//	float temperature;
+//	float humidity;
 //	uint16_t pressure;
 //	uint16_t CO2;
 //	uint16_t TVOC;
@@ -113,8 +117,9 @@ int8_t user_i2c_write(uint8_t id, uint8_t reg_addr, uint8_t *data, uint16_t len)
 int8_t user_i2c_read(uint8_t id, uint8_t reg_addr, uint8_t *data, uint16_t len);
 void user_delay_ms(uint32_t period);
 struct bme280_dev dev = {.dev_id = BME280_I2C_ADDR_SEC, .intf = BME280_I2C_INTF, .read = user_i2c_read, .write = user_i2c_write, .delay_ms = user_delay_ms};
-struct bme280_data comp_data;
-int8_t rslt;
+struct bme280_data comp_data = {0};
+int8_t rslt = 0;
+uint32_t count_tt = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -122,39 +127,19 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI1_Init(void);
+static void MX_TIM3_Init(void);
 void StartTask01(void *argument);
 void StartTask02(void *argument);
-void StartTask03(void *argument);
 
 /* USER CODE BEGIN PFP */
-
+void vTaskDelayUntil(TickType_t * const pxPreviousWakeTime, const TickType_t xTimeIncrement);
+TickType_t xTaskGetTickCount(void);
+void lora_module_send_packet_read_data(struct LoRa_module* module);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-int8_t user_i2c_read(uint8_t id, uint8_t reg_addr, uint8_t *data, uint16_t len)
-{
-  if(HAL_I2C_Master_Transmit(&hi2c1, (id << 1), &reg_addr, 1, 10) != HAL_OK) return -1;
-  if(HAL_I2C_Master_Receive(&hi2c1, (id << 1) | 0x01, data, len, 10) != HAL_OK) return -1;
 
-  return 0;
-}
-
-void user_delay_ms(uint32_t period)
-{
-  HAL_Delay(period);
-}
-
-int8_t user_i2c_write(uint8_t id, uint8_t reg_addr, uint8_t *data, uint16_t len)
-{
-  int8_t *buf;
-  buf = malloc(len +1);
-  buf[0] = reg_addr;
-  memcpy(buf +1, data, len);
-  if(HAL_I2C_Master_Transmit(&hi2c1, (id << 1), (uint8_t*)buf, len + 1, HAL_MAX_DELAY) != HAL_OK) return -1;
-  free(buf);
-  return 0;
-}
 /* USER CODE END 0 */
 
 /**
@@ -173,9 +158,6 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-//  lora_sensor_init(&dht_sensor, Air_temperature, 0);
-//  lora_module = lora_module_init(&dht_sensor, 1, 0, 0, LED1_PIN_GPIO_Port, LED1_PIN_Pin,
-//		  LED3_PIN_GPIO_Port, LED3_PIN_Pin, LED2_PIN_GPIO_Port, LED2_PIN_Pin);
 
   /* USER CODE END Init */
 
@@ -190,6 +172,7 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_SPI1_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   LoRa_init(&hspi1);
   result = LoRa_begin(BAND, true, 14, 7, 250E3, 0x4A);
@@ -202,10 +185,10 @@ int main(void)
 	  HAL_GPIO_WritePin(LED2_PIN_GPIO_Port, LED2_PIN_Pin, GPIO_PIN_RESET);
 	  HAL_GPIO_WritePin(LED3_PIN_GPIO_Port, LED3_PIN_Pin, GPIO_PIN_RESET);
 	  while(result != 0) {
-		  result = LoRa_begin(BAND, true, 14, 11, 125E3, 0x4A);
-			  HAL_GPIO_WritePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin, GPIO_PIN_SET);
-			  HAL_GPIO_WritePin(LED2_PIN_GPIO_Port, LED2_PIN_Pin, GPIO_PIN_RESET);
-			  HAL_GPIO_WritePin(LED3_PIN_GPIO_Port, LED3_PIN_Pin, GPIO_PIN_RESET);
+		  //result = LoRa_begin(BAND, true, 14, 11, 125E3, 0x4A);
+		  HAL_GPIO_WritePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(LED2_PIN_GPIO_Port, LED2_PIN_Pin, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(LED3_PIN_GPIO_Port, LED3_PIN_Pin, GPIO_PIN_RESET);
 	  }
   }
 
@@ -223,6 +206,8 @@ int main(void)
   dev.settings.osr_t = BME280_OVERSAMPLING_2X;
   dev.settings.filter = BME280_FILTER_COEFF_16;
   rslt = bme280_set_sensor_settings(BME280_OSR_PRESS_SEL | BME280_OSR_TEMP_SEL | BME280_OSR_HUM_SEL | BME280_FILTER_SEL, &dev);
+  rslt = bme280_set_sensor_mode(BME280_NORMAL_MODE, &dev);
+  //configureCCS811();
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -250,9 +235,6 @@ int main(void)
 
   /* creation of Task02 */
   Task02Handle = osThreadNew(StartTask02, NULL, &Task02_attributes);
-
-  /* creation of Task03 */
-  Task03Handle = osThreadNew(StartTask03, NULL, &Task03_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -385,6 +367,51 @@ static void MX_SPI1_Init(void)
 }
 
 /**
+  * @brief TIM3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM3_Init(void)
+{
+
+  /* USER CODE BEGIN TIM3_Init 0 */
+
+  /* USER CODE END TIM3_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM3_Init 1 */
+
+  /* USER CODE END TIM3_Init 1 */
+  htim3.Instance = TIM3;
+  htim3.Init.Prescaler = 72;
+  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim3.Init.Period = 65535;
+  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM3_Init 2 */
+
+  /* USER CODE END TIM3_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -434,7 +461,29 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+int8_t user_i2c_read(uint8_t id, uint8_t reg_addr, uint8_t *data, uint16_t len)
+{
+  if(HAL_I2C_Master_Transmit(&hi2c1, (id << 1), &reg_addr, 1, 10) != HAL_OK) return -1;
+  if(HAL_I2C_Master_Receive(&hi2c1, (id << 1) | 0x01, data, len, 10) != HAL_OK) return -1;
 
+  return 0;
+}
+
+void user_delay_ms(uint32_t period)
+{
+  HAL_Delay(period);
+}
+
+int8_t user_i2c_write(uint8_t id, uint8_t reg_addr, uint8_t *data, uint16_t len)
+{
+  int8_t *buf;
+  buf = malloc(len +1);
+  buf[0] = reg_addr;
+  memcpy(buf +1, data, len);
+  if(HAL_I2C_Master_Transmit(&hi2c1, (id << 1), (uint8_t*)buf, len + 1, HAL_MAX_DELAY) != HAL_OK) return -1;
+  free(buf);
+  return 0;
+}
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartTask01 */
@@ -447,10 +496,13 @@ static void MX_GPIO_Init(void)
 void StartTask01(void *argument)
 {
   /* USER CODE BEGIN 5 */
-
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = 1000;
+  xLastWakeTime = xTaskGetTickCount();
   /* Infinite loop */
   for(;;)
   {
+	vTaskDelayUntil(&xLastWakeTime, xFrequency);
 	unsigned int data0, data1;
 	if (TSL2561_getData(&data0, &data1))
 	{
@@ -459,7 +511,18 @@ void StartTask01(void *argument)
 		sensors_data.lux = lux;
 		lora_sensor_set_data(&illumination_sensor,(float)lux);
 	}
-	osDelay(1000);
+	//rslt = bme280_set_sensor_mode(BME280_NORMAL_MODE, &dev);
+	//dev.delay_ms(40);
+	rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, &dev);
+	if(rslt == BME280_OK)
+	{
+		sensors_data.temperature = comp_data.temperature / 100.0;      /* C  */
+		sensors_data.humidity = comp_data.humidity / 1024.0;           /* %   */
+		sensors_data.pressure = comp_data.pressure / 10000.0 / 1.333;  /* hPa or mmhg */
+	}
+	++cnt_task_1;
+	//rslt = bme280_set_sensor_mode(BME280_SLEEP_MODE, &dev);
+	//osDelay(1000);
   }
   /* USER CODE END 5 */
 }
@@ -474,42 +537,18 @@ void StartTask01(void *argument)
 void StartTask02(void *argument)
 {
   /* USER CODE BEGIN StartTask02 */
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = 1000;
+  xLastWakeTime = xTaskGetTickCount();
   /* Infinite loop */
   for(;;)
   {
-	rslt = bme280_set_sensor_mode(BME280_NORMAL_MODE, &dev);
-	dev.delay_ms(40);
-	rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, &dev);
-	if(rslt == BME280_OK)
-	{
-		sensors_data.temperature = comp_data.temperature / 100.0;      /* C  */
-		sensors_data.humidity = comp_data.humidity / 1024.0;           /* %   */
-		sensors_data.pressure = comp_data.pressure / 10000.0 / 1.333;  /* hPa or mmhg */
-	}
-	rslt = bme280_set_sensor_mode(BME280_SLEEP_MODE, &dev);
-    osDelay(1000);
+	vTaskDelayUntil(&xLastWakeTime, xFrequency);
+	lora_module_send_packet_read_data(&lora_module);
+	++cnt_task_2;
+
   }
   /* USER CODE END StartTask02 */
-}
-
-/* USER CODE BEGIN Header_StartTask03 */
-/**
-* @brief Function implementing the Task03 thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartTask03 */
-void StartTask03(void *argument)
-{
-  /* USER CODE BEGIN StartTask03 */
-  /* Infinite loop */
-  for(;;)
-  {
-	//lora_module_introduce(&lora_module, &sensors_data);
-	lora_module_send_packet_read_data(&lora_module);
-    osDelay(1000);
-  }
-  /* USER CODE END StartTask03 */
 }
 
  /**

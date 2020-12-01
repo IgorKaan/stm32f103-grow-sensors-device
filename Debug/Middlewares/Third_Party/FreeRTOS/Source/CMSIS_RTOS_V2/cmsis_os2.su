@@ -58,9 +58,9 @@ cmsis_os2.c:1598:12:osMessageQueuePut	16	static,ignoring_inline_asm
 cmsis_os2.c:1639:12:osMessageQueueGet	16	static,ignoring_inline_asm
 cmsis_os2.c:1680:10:osMessageQueueGetCapacity	0	static
 cmsis_os2.c:1694:10:osMessageQueueGetMsgSize	0	static
-cmsis_os2.c:1708:10:osMessageQueueGetCount	0	static,ignoring_inline_asm
+cmsis_os2.c:1708:10:osMessageQueueGetCount	0	static
 cmsis_os2.c:1725:10:osMessageQueueGetSpace	0	static,ignoring_inline_asm
 cmsis_os2.c:1748:12:osMessageQueueReset	8	static,ignoring_inline_asm
-cmsis_os2.c:1766:12:osMessageQueueDelete	8	static,ignoring_inline_asm
-cmsis_os2.c:1857:6:vApplicationGetIdleTaskMemory	8	static
-cmsis_os2.c:1867:6:vApplicationGetTimerTaskMemory	8	static
+cmsis_os2.c:1766:12:osMessageQueueDelete	0	static
+cmsis_os2.c:1857:6:vApplicationGetIdleTaskMemory	0	static
+cmsis_os2.c:1867:6:vApplicationGetTimerTaskMemory	0	static
