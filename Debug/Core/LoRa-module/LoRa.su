@@ -1,5 +1,5 @@
 LoRa.cpp:77:9:uint8_t LoRa_class::field_set(Address_field, uint32_t, bool)	48	static
-LoRa.cpp:468:6:bool LoRa_class::packet_end(uint32_t, bool)	192	static
+LoRa.cpp:481:6:bool LoRa_class::packet_end(uint32_t, bool)	192	static
 LoRa.cpp:33:1:LoRa_class::LoRa_class()	24	static
 LoRa.cpp:36:1:LoRa_class::LoRa_class(SPI_HandleTypeDef*)	32	static
 LoRa.cpp:39:1:LoRa_class::~LoRa_class()	8	static
@@ -14,27 +14,28 @@ LoRa.cpp:154:9:uint8_t LoRa_class::mode_sleep()	128	static
 LoRa.cpp:158:9:uint8_t LoRa_class::mode_STDBY()	128	static
 LoRa.cpp:162:9:uint8_t LoRa_class::mode_TX(bool)	184	static
 LoRa.cpp:167:9:uint8_t LoRa_class::mode_FSTX()	128	static
-LoRa.cpp:171:9:uint8_t LoRa_class::mode_RX_continuous(bool)	200	static
-LoRa.cpp:179:9:uint8_t LoRa_class::mode_RX_single(bool)	200	static
-LoRa.cpp:187:9:uint8_t LoRa_class::mode_CAD(bool)	200	static
-LoRa.cpp:197:9:uint8_t LoRa_class::set_TX_power(uint8_t, bool, uint8_t)	160	static
-LoRa.cpp:240:9:uint8_t LoRa_class::set_frequency(uint64_t)	80	static
-LoRa.cpp:247:9:uint8_t LoRa_class::set_spreading_factor(uint8_t)	128	static
-LoRa.cpp:267:9:uint8_t LoRa_class::set_signal_bandwidth(uint64_t)	80	static
+LoRa.cpp:171:9:uint8_t LoRa_class::mode_FSRX()	128	static
+LoRa.cpp:176:9:uint8_t LoRa_class::mode_RX_continuous(bool)	200	static
+LoRa.cpp:184:9:uint8_t LoRa_class::mode_RX_single(bool)	200	static
+LoRa.cpp:192:9:uint8_t LoRa_class::mode_CAD(bool)	200	static
+LoRa.cpp:202:9:uint8_t LoRa_class::set_TX_power(uint8_t, bool, uint8_t)	160	static
+LoRa.cpp:245:9:uint8_t LoRa_class::set_frequency(uint64_t)	80	static
+LoRa.cpp:252:9:uint8_t LoRa_class::set_spreading_factor(uint8_t)	128	static
+LoRa.cpp:272:9:uint8_t LoRa_class::set_signal_bandwidth(uint64_t)	80	static
 LoRa.cpp:102:9:uint8_t LoRa_class::begin(uint64_t, bool, uint8_t, uint8_t, uint64_t, uint8_t)	280	static
-LoRa.cpp:283:9:uint8_t LoRa_class::set_preamble_length(unsigned int)	80	static
-LoRa.cpp:288:9:uint8_t LoRa_class::set_sync_word(uint8_t)	80	static
-LoRa.cpp:293:9:uint8_t LoRa_class::crc_enable()	80	static
-LoRa.cpp:297:9:uint8_t LoRa_class::crc_disable()	80	static
-LoRa.cpp:379:19:LoRa_packet LoRa_class::read_packet_data(bool, bool, bool)	264	static
-LoRa.cpp:303:19:LoRa_packet LoRa_class::receiver_packet(uint8_t, uint32_t, bool, bool)	360	static
-LoRa.cpp:408:9:uint8_t LoRa_class::packet_rssi()	80	static
-LoRa.cpp:418:7:float LoRa_class::packet_snr()	80	static
-LoRa.cpp:424:6:bool LoRa_class::sender_packet(uint8_t*, uint8_t, uint32_t)	280	static
-LoRa.cpp:432:6:bool LoRa_class::sender_packet(std::vector<unsigned char>, uint32_t)	280	static
-LoRa.cpp:441:6:bool LoRa_class::packet_begin()	152	static
-LoRa.cpp:448:6:bool LoRa_class::packet_write(uint8_t*, uint8_t)	120	static
-LoRa.cpp:457:6:bool LoRa_class::packet_write(std::vector<unsigned char>)	120	static
-LoRa.cpp:468:6:bool LoRa_class::packet_end(uint32_t, bool)	192	static
-LoRa.cpp:501:1:cpp)	0	static
-LoRa.cpp:501:1:cpp)	0	static
+LoRa.cpp:288:9:uint8_t LoRa_class::set_preamble_length(unsigned int)	80	static
+LoRa.cpp:293:9:uint8_t LoRa_class::set_sync_word(uint8_t)	80	static
+LoRa.cpp:298:9:uint8_t LoRa_class::crc_enable()	80	static
+LoRa.cpp:302:9:uint8_t LoRa_class::crc_disable()	80	static
+LoRa.cpp:389:19:LoRa_packet LoRa_class::read_packet_data(bool, bool, bool)	216	static
+LoRa.cpp:307:19:LoRa_packet LoRa_class::receiver_packet(uint8_t, ulong, bool, bool)	368	static
+LoRa.cpp:421:9:uint8_t LoRa_class::packet_rssi()	80	static
+LoRa.cpp:431:7:float LoRa_class::packet_snr()	80	static
+LoRa.cpp:437:6:bool LoRa_class::sender_packet(uint8_t*, uint8_t, uint32_t)	280	static
+LoRa.cpp:445:6:bool LoRa_class::sender_packet(std::vector<unsigned char>, uint32_t)	280	static
+LoRa.cpp:454:6:bool LoRa_class::packet_begin()	152	static
+LoRa.cpp:461:6:bool LoRa_class::packet_write(uint8_t*, uint8_t)	120	static
+LoRa.cpp:470:6:bool LoRa_class::packet_write(std::vector<unsigned char>)	120	static
+LoRa.cpp:481:6:bool LoRa_class::packet_end(uint32_t, bool)	192	static
+LoRa.cpp:514:1:cpp)	0	static
+LoRa.cpp:514:1:cpp)	0	static

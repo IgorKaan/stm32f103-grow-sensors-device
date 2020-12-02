@@ -29,8 +29,7 @@ Core/LoRa-module/LoRa.o: ../Core/LoRa-module/LoRa.cpp \
  /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/LoRa-module/LoRa_register.h \
  /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/LoRa-module/Address_field.h \
  /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/LoRa-module/LoRa_register_data.h \
- /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/LoRa-module/LoRa_packet.h \
- /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/my_lib/LoRa_module/LoRa_packet_data.h
+ /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/LoRa-module/LoRa_packet.h
 
 ../Core/LoRa-module/LoRa.h:
 
@@ -95,5 +94,3 @@ Core/LoRa-module/LoRa.o: ../Core/LoRa-module/LoRa.cpp \
 /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/LoRa-module/LoRa_register_data.h:
 
 /home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/LoRa-module/LoRa_packet.h:
-
-/home/igor/STM32CubeIDE/workspace_1.5.0/stm32f103-sensors-device/Core/my_lib/LoRa_module/LoRa_packet_data.h:

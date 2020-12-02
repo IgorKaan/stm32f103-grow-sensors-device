@@ -10,9 +10,9 @@ LoRa_contact_data.cpp:70:6:bool LoRa_contact_data::set_channel(uint16_t)	0	stati
 LoRa_contact_data.cpp:78:10:uint16_t LoRa_contact_data::get_channel()	0	static
 LoRa_contact_data.cpp:126:6:bool LoRa_contact_data::clear_send_packet()	24	static
 LoRa_contact_data.cpp:154:6:bool LoRa_contact_data::start_transfer()	32	static
-LoRa_contact_data.cpp:171:6:bool LoRa_contact_data::wait_recipient(LoRa_address)	48	static
+LoRa_contact_data.cpp:171:6:bool LoRa_contact_data::wait_recipient(LoRa_address)	40	static
 LoRa_contact_data.cpp:184:10:uint16_t LoRa_contact_data::broadcast_send(bool)	48	static
-LoRa_contact_data.cpp:199:10:uint16_t LoRa_contact_data::broadcast_receive(LoRa_address)	56	static
+LoRa_contact_data.cpp:199:10:uint16_t LoRa_contact_data::broadcast_receive(LoRa_address)	48	static
 LoRa_contact_data.cpp:208:10:uint16_t LoRa_contact_data::complete_broadcast_receive()	24	static
 LoRa_contact_data.cpp:222:9:uint8_t LoRa_contact_data::get_amt_packet()	0	static
 LoRa_contact_data.cpp:227:8:int8_t LoRa_contact_data::get_state_contact()	0	static
@@ -34,25 +34,25 @@ LoRa_contact_data.cpp:677:6:bool LoRa_contact_data::check_packet_type(uint8_t, s
 LoRa_contact_data.cpp:690:9:int16_t LoRa_contact_data::search_num_packet(uint16_t)	72	static
 LoRa_contact_data.cpp:755:10:uint16_t LoRa_contact_data::init_connection()	64	static
 LoRa_contact_data.cpp:775:10:uint16_t LoRa_contact_data::init_connection_expect()	64	static
-LoRa_contact_data.cpp:882:10:uint16_t LoRa_contact_data::init_connection_wait()	56	static
+LoRa_contact_data.cpp:882:10:uint16_t LoRa_contact_data::init_connection_wait()	48	static
 LoRa_contact_data.cpp:954:10:uint16_t LoRa_contact_data::init_exchange_boardcast()	40	static
-LoRa_contact_data.cpp:997:10:uint16_t LoRa_contact_data::init_exchange_wait_confirmation()	72	static
+LoRa_contact_data.cpp:997:10:uint16_t LoRa_contact_data::init_exchange_wait_confirmation()	64	static
 LoRa_contact_data.cpp:1181:10:uint16_t LoRa_contact_data::init_disconnect()	0	static
 LoRa_contact_data.cpp:1225:10:uint16_t LoRa_contact_data::recip_connection_queue_check()	32	static
 LoRa_contact_data.cpp:1637:10:uint16_t LoRa_contact_data::broadcast_send_packet()	56	static
 LoRa_contact_data.cpp:1693:6:void LoRa_contact_data::contact_complete()	0	static
-LoRa_contact_data.cpp:1697:6:void LoRa_contact_data::set_LoRa_mode_receive()	32	static
+LoRa_contact_data.cpp:1697:6:void LoRa_contact_data::set_LoRa_mode_receive()	24	static
 LoRa_contact_data.cpp:1703:6:void LoRa_contact_data::set_LoRa_mode_send(bool)	32	static
 LoRa_contact_data.cpp:1735:6:void LoRa_contact_data::set_LoRa_mode_sleep()	0	static
 vector.tcc:179:5:std::vector<_Tp, _Alloc>& std::vector<_Tp, _Alloc>::operator=(const std::vector<_Tp, _Alloc>&) [with _Tp = unsigned char; _Alloc = std::allocator<unsigned char>]	24	static
 LoRa_contact_data.cpp:715:6:void LoRa_contact_data::sort_num_packet()	88	static
-LoRa_contact_data.cpp:1459:10:uint16_t LoRa_contact_data::recip_exchange_wait_reaction()	56	static
-LoRa_contact_data.cpp:1550:10:uint16_t LoRa_contact_data::recip_disconnect()	56	static
+LoRa_contact_data.cpp:1459:10:uint16_t LoRa_contact_data::recip_exchange_wait_reaction()	48	static
+LoRa_contact_data.cpp:1550:10:uint16_t LoRa_contact_data::recip_disconnect()	48	static
 vector.tcc:793:5:void std::vector<bool, _Alloc>::_M_insert_aux(std::vector<bool, _Alloc>::iterator, bool) [with _Alloc = std::allocator<bool>]	64	static
 LoRa_contact_data.cpp:700:9:uint8_t LoRa_contact_data::pop_num_packet(std::vector<short unsigned int>)	80	static
 vector.tcc:95:7:) [with _Args = {LoRa_address}; _Tp = LoRa_address; _Alloc = std::allocator<LoRa_address>]	32	static
-LoRa_contact_data.cpp:1257:10:uint16_t LoRa_contact_data::recip_connection_wait_request()	56	static
-LoRa_contact_data.cpp:1205:10:uint16_t LoRa_contact_data::recip_connection()	56	static
+LoRa_contact_data.cpp:1257:10:uint16_t LoRa_contact_data::recip_connection_wait_request()	48	static
+LoRa_contact_data.cpp:1205:10:uint16_t LoRa_contact_data::recip_connection()	48	static
 vector.tcc:394:7:) [with _Args = {std::vector<unsigned char, std::allocator<unsigned char> >}; _Tp = std::vector<unsigned char>; _Alloc = std::allocator<std::vector<unsigned char> >]	40	static
 LoRa_contact_data.cpp:1386:10:uint16_t LoRa_contact_data::recip_exchange_expect()	40	static
 LoRa_contact_data.cpp:109:6:bool LoRa_contact_data::add_packet(const Exchange_packet&)	32	static
@@ -61,8 +61,8 @@ LoRa_contact_data.cpp:97:9:uint8_t LoRa_contact_data::add_packet(std::vector<std
 LoRa_contact_data.cpp:85:6:bool LoRa_contact_data::add_packet(uint8_t, uint8_t*, uint8_t)	80	static
 LoRa_contact_data.cpp:1606:10:uint16_t LoRa_contact_data::broadcast_wait_packet()	40	static
 LoRa_contact_data.cpp:109:6:bool LoRa_contact_data::add_packet(const Exchange_packet&)	32	static
-LoRa_contact_data.cpp:1366:10:uint16_t LoRa_contact_data::recip_exchange()	56	static
+LoRa_contact_data.cpp:1366:10:uint16_t LoRa_contact_data::recip_exchange()	48	static
 vector.tcc:394:7:) [with _Args = {short unsigned int}; _Tp = short unsigned int; _Alloc = std::allocator<short unsigned int>]	48	static
 LoRa_contact_data.cpp:1084:10:uint16_t LoRa_contact_data::init_exchange_wait_numbers()	64	static
-LoRa_contact_data.cpp:929:10:uint16_t LoRa_contact_data::init_exchange()	72	static
-LoRa_contact_data.cpp:265:10:uint16_t LoRa_contact_data::work_contact_system()	56	static
+LoRa_contact_data.cpp:929:10:uint16_t LoRa_contact_data::init_exchange()	64	static
+LoRa_contact_data.cpp:265:10:uint16_t LoRa_contact_data::work_contact_system()	48	static

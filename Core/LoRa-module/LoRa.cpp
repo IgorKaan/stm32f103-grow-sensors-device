@@ -167,6 +167,11 @@ uint8_t LoRa_class::mode_TX(bool set_dio) {
 uint8_t LoRa_class::mode_FSTX() {
     return set_mode(MODE_FSTX);
 }
+
+uint8_t LoRa_class::mode_FSRX() {
+    return set_mode(MODE_FSRX);
+}
+
 // Режим непрерывного приёма
 uint8_t LoRa_class::mode_RX_continuous(bool set_dio) {
     if (set_dio & ((_dio0_pin != 0) || (_dio1_pin != 0))) {
@@ -298,30 +303,30 @@ uint8_t LoRa_class::crc_disable() {
     return field_set(RxPayloadCrcOn, 0);
 }
 
-
 // Приём пакета
-class LoRa_packet LoRa_class::receiver_packet(uint8_t count, uint32_t wait, bool rssi, bool snr) {
-	bool no_wait = false;
-    class LoRa_packet send_packet(nullptr, 0, 0, 0);
+class LoRa_packet LoRa_class::receiver_packet(uint8_t count, ulong wait, bool rssi, bool snr) {
+    class LoRa_packet send_packet;
     Address_field fields[3] = {RxTimeout, RxDone, PayloadCrcError};
     Address_field flags[3] = {RxDone, ValidHeader, PayloadCrcError};
-    if(wait == 0)
-    	no_wait = true;
-    if(count == 1) {
-        mode_RX_single();
+    if(count <= 1) {
+        if(count == 1)
+            mode_RX_single();
         uint8_t rx_done, rx_timeout, crc_err;
         uint8_t amt;
         bool signal = false;
-        uint32_t time, start_time, read_time;
+        ulong time, start_time, read_time;
         int pin_done, pin_timeout, pin_crc_err;
         uint32_t values[3] = {0, 0, 0};
         rx_done = rx_timeout = crc_err = 0;
-        for(time = HAL_GetTick(), start_time = time, read_time = time; (HAL_GetTick() - time < wait)||(no_wait);) {
+        if(wait == 0)
+            time = 0;
+        else
+            time = HAL_GetTick();
+        for(start_time = time, read_time = time; (wait == 0) || (HAL_GetTick() - time < wait);) {
             // Считывание каждые 10 мс.
-            if((HAL_GetTick() - read_time > 10U) || (no_wait)) {
-            	no_wait = false;
+            if((wait == 0) || (HAL_GetTick() - read_time > 10U)) {
                 // Если работают DIO выходы, то при HIGH хотя бы на одном из них, пускаем signal
-                if ((_dio0_pin != 0) && (_dio1_pin != 0)) {
+            	if ((_dio0_pin != 0) && (_dio1_pin != 0)) {
                 	pin_done = HAL_GPIO_ReadPin(_dio0_port, _dio0_pin);
                 	pin_timeout = HAL_GPIO_ReadPin(_dio1_port, _dio1_pin);
                     if (_dio3_pin != 0) {
@@ -333,9 +338,9 @@ class LoRa_packet LoRa_class::receiver_packet(uint8_t count, uint32_t wait, bool
                     if ((pin_done == GPIO_PIN_SET) || (pin_timeout == GPIO_PIN_SET) || (pin_crc_err == GPIO_PIN_SET)) {
                         signal = true;
                     }
-                }
+            	}
                 // Если неработают DIO выходы, был signal или превышено время ожидания
-                if ((_dio0_pin == 0) || (_dio1_pin == 0) || (HAL_GetTick() - start_time > 2000) || signal) {
+                if (((count == 0) && (wait == 0)) || (_dio0_pin == 0) || (_dio1_pin == 0) || (HAL_GetTick() - start_time > 2000) || signal) {
                     amt = field_get(fields, values, 3, true);
                     if(amt == 3) {
                         rx_timeout = values[0];
@@ -351,21 +356,26 @@ class LoRa_packet LoRa_class::receiver_packet(uint8_t count, uint32_t wait, bool
                     mode_RX_single(false);
                     rx_done = rx_timeout = crc_err = 0;
                     signal = false;
-                    start_time = HAL_GetTick();
+                    if(wait != 0)
+                        start_time = HAL_GetTick();
+                }
+                if(wait == 0) {
+                    break;
                 }
             }
         }
-
-        if(rx_done > 0) {
+        if((rx_done > 0) /*&& (crc_err == 0)*/) {
             _reg_field.clear_flags(RxDone);
+            _reg_field.clear_flags(RxTimeout);
             send_packet = read_packet_data(crc_err, rssi, snr);
         }
         else {
             field_get(fields, values, 3, true);
             _reg_field.clear_flags(flags, 3);
-            send_packet = LoRa_packet(nullptr, 0);
+            // send_packet = LoRa_packet();
         }
-        mode_sleep();
+        if(wait != 0)
+            mode_sleep();
     }
     else {
         for(int i = 0; i < count; ++i) {
@@ -378,29 +388,32 @@ class LoRa_packet LoRa_class::receiver_packet(uint8_t count, uint32_t wait, bool
 // Содержание последнего принятого пакета
 class LoRa_packet LoRa_class::read_packet_data(bool crc_err, bool f_rssi, bool f_snr) {
     uint32_t length, adr;
-    uint8_t rssi, *data;
-    float snr;
+    uint8_t rssi;//, *data;
     if (f_rssi)
         rssi = packet_rssi();
     else
         rssi = 0;
-    if (f_snr)
-        snr = packet_snr();
-    else
-        snr = 0;
+
     field_get(FifoRxBytesNb, &length, true);
     field_get(FifoRxCurrentAddr, &adr, true);
     field_set(FifoAddrPtr, adr);
 
-    data = new uint8_t[length];
+    class LoRa_packet send_packet(nullptr, 0, crc_err, rssi);
     uint32_t data32 = 0;
-    for(int i = 0; i < (int)length; ++i) {
+    for(unsigned int i = 0; i < length; ++i) {
         field_get(Fifo, &data32, true);
-        data[i] = data32 & 0xFF;
+        send_packet.add_packet_data(data32);
+        // send_packet.add_packet_data((uint8_t)(data32 & 0xFF));
+        // data[i] = data32 & 0xFF;
     }
-    class LoRa_packet send_packet(data, length, crc_err, rssi, snr);
-    delete[] data;
-
+    // data = new uint8_t[length];
+    // uint32_t data32 = 0;
+    // for(int i = 0; i < length; ++i) {
+    //     field_get(Fifo, &data32, true);
+    //     data[i] = data32 & 0xFF;
+    // }
+    // class LoRa_packet send_packet(data, length, crc_err, rssi);
+    // delete[] data;
     return send_packet;
 }
 
