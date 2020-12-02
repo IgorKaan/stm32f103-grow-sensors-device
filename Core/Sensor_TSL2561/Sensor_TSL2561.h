@@ -12,8 +12,8 @@
 #include <math.h>
 #include "stm32f1xx.h"
 
-//#define TSL2561_ADDR 0x29 << 1	// address with '0' shorted on board
-#define TSL2561_ADDR   0x39 << 1 	// default address 0x39 = 57
+#define TSL2561_ADDR 0x29 << 1	// address with '0' shorted on board
+//#define TSL2561_ADDR   0x39 << 1 	// default address 0x39 = 57
 // #define TSL2561_ADDR_1 0x49 << 1	// address with '1' shorted on board
 
 // TSL2561 registers

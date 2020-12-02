@@ -10,11 +10,9 @@
 
 typedef struct {
 	uint16_t lux;
-	uint16_t temperature;
-	uint16_t humidity;
+	float temperature;
+	float humidity;
 	uint16_t pressure;
-	uint16_t CO2;
-	uint16_t TVOC;
 } SensorsDataTypeDef;
 
 struct LoRa_module {

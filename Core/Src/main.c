@@ -92,11 +92,11 @@ SensorsDataTypeDef sensors_data;
 LoRa_sensor illumination_sensor;
 
 struct LoRa_module lora_module = {
-		.my_adr = {0,8,1},
-		.esp_adr = {0xFF,0xFF,0xFF},
-		.state_regist=1,
-		.num_packet=0,
-		.amt_sensors=1,
+		.my_adr = {0x01, 0x00, 0x01},
+		.esp_adr = {0x01, 0x00, 0x00},
+		.state_regist = 1,
+		.num_packet = 0,
+		.amt_sensors = 1,
 		.sensors = &illumination_sensor};
 uint8_t result;
 
@@ -117,6 +117,8 @@ void user_delay_ms(uint32_t period);
 struct bme280_dev dev = {.dev_id = BME280_I2C_ADDR_SEC, .intf = BME280_I2C_INTF, .read = user_i2c_read, .write = user_i2c_write, .delay_ms = user_delay_ms};
 struct bme280_data comp_data;
 int8_t rslt;
+uint16_t exti5_10, exti2;
+uint16_t cnt_task_1, cnt_task_2, cnt_task_3;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -130,7 +132,10 @@ void StartTask02(void *argument);
 void StartTask03(void *argument);
 
 /* USER CODE BEGIN PFP */
-
+void lora_module_recieve_packet(struct LoRa_module* module);
+void lora_module_send_packet_read_data(struct LoRa_module* module);
+void vTaskDelayUntil(TickType_t * const pxPreviousWakeTime, const TickType_t xTimeIncrement);
+TickType_t xTaskGetTickCount(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -196,7 +201,7 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   LoRa_init(&hspi1);
-  result = LoRa_begin(BAND, true, 14, 7, 250E3, 0x4A);
+  result = LoRa_begin(BAND, true, 14, 8, 250E3, 0x4A);
   if(result == 0) {
 	  HAL_GPIO_WritePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin, GPIO_PIN_SET);
 	  HAL_GPIO_WritePin(LED2_PIN_GPIO_Port, LED2_PIN_Pin, GPIO_PIN_SET);
@@ -464,7 +469,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pins : LORA_DIO1_Pin LORA_DIO0_Pin */
   GPIO_InitStruct.Pin = LORA_DIO1_Pin|LORA_DIO0_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LORA_RESET_Pin CO2_WAKE_UP_Pin */
@@ -484,7 +489,18 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if(GPIO_Pin== GPIO_PIN_2) {
+    exti2++;
+    lora_module_recieve_packet(&lora_module);
+  } else if(GPIO_Pin== GPIO_PIN_10){
+    exti5_10++;
+    lora_module_recieve_packet(&lora_module);
+  } else{
+    __NOP();
+  }
+}
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartTask01 */
@@ -497,10 +513,13 @@ static void MX_GPIO_Init(void)
 void StartTask01(void *argument)
 {
   /* USER CODE BEGIN 5 */
-
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = 1000;
+  xLastWakeTime = xTaskGetTickCount();
   /* Infinite loop */
   for(;;)
   {
+	vTaskDelayUntil(&xLastWakeTime, xFrequency);
 	unsigned int data0, data1;
 	if (TSL2561_getData(&data0, &data1))
 	{
@@ -509,7 +528,7 @@ void StartTask01(void *argument)
 		sensors_data.lux = lux;
 		lora_sensor_set_data(&illumination_sensor,(float)lux);
 	}
-	osDelay(1000);
+	cnt_task_1++;
   }
   /* USER CODE END 5 */
 }
@@ -524,9 +543,13 @@ void StartTask01(void *argument)
 void StartTask02(void *argument)
 {
   /* USER CODE BEGIN StartTask02 */
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = 2000;
+  xLastWakeTime = xTaskGetTickCount();
   /* Infinite loop */
   for(;;)
   {
+	vTaskDelayUntil(&xLastWakeTime, xFrequency);
 	//rslt = bme280_set_sensor_mode(BME280_NORMAL_MODE, &dev);
 	//dev.delay_ms(40);
 	rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, &dev);
@@ -536,8 +559,8 @@ void StartTask02(void *argument)
 		sensors_data.humidity = comp_data.humidity / 1024.0;           /* %   */
 		sensors_data.pressure = comp_data.pressure / 10000.0 / 1.333;  /* hPa or mmhg */
 	}
+	cnt_task_2++;
 	//rslt = bme280_set_sensor_mode(BME280_SLEEP_MODE, &dev);
-    osDelay(1000);
   }
   /* USER CODE END StartTask02 */
 }
@@ -552,13 +575,23 @@ void StartTask02(void *argument)
 void StartTask03(void *argument)
 {
   /* USER CODE BEGIN StartTask03 */
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = 5500;
+  xLastWakeTime = xTaskGetTickCount();
   /* Infinite loop */
   for(;;)
   {
+	vTaskDelayUntil(&xLastWakeTime, xFrequency);
 	//lora_module_introduce(&lora_module, &sensors_data);
+	HAL_GPIO_TogglePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin);
 	lora_module_send_packet_read_data(&lora_module);
-    osDelay(1000);
+	//
+	HAL_GPIO_TogglePin(LORA_DIO0_GPIO_Port, LORA_DIO0_Pin);
+	HAL_GPIO_TogglePin(LORA_DIO1_GPIO_Port, LORA_DIO1_Pin);
+	cnt_task_3++;
+	//lora_module_recieve_packet(&lora_module);
   }
+
   /* USER CODE END StartTask03 */
 }
 

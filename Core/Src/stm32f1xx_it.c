@@ -61,7 +61,7 @@ extern SPI_HandleTypeDef hspi1;
 extern TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN EV */
-
+extern uint16_t exti5_10, exti2;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -172,7 +172,7 @@ void EXTI2_IRQHandler(void)
   /* USER CODE END EXTI2_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
   /* USER CODE BEGIN EXTI2_IRQn 1 */
-
+  //exti2++;
   /* USER CODE END EXTI2_IRQn 1 */
 }
 
@@ -242,7 +242,7 @@ void EXTI15_10_IRQHandler(void)
   /* USER CODE END EXTI15_10_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
   /* USER CODE BEGIN EXTI15_10_IRQn 1 */
-
+  //exti5_10++;
   /* USER CODE END EXTI15_10_IRQn 1 */
 }
 

@@ -20,14 +20,15 @@ bool lora_module_reciv_packet_use_device(struct LoRa_module* module);
 void lora_module_send_packet(struct LoRa_module* module) {
 	if(module->led)
 		lora_led_struct_set_OUT(module->packet._len);
-	LoRa_sender_packet(module->packet._data, module->packet._len, 2000);
+	LoRa_sender_packet(module->packet._data, module->packet._len, 0);
+//	LoRa_sender_packet(module->packet._data, module->packet._len, 2000);
     ++(module->num_packet);
 }
 // ----------------------------------------------------------------------------------------------------------
 bool lora_module_recieve_packet(struct LoRa_module* module) {
 	packet_delete(&(module->packet));
 //	module->packet = LoRa_receiver_packet(1, 0, false, false);
-	module->packet = LoRa_receiver_packet(1, 10000, false, false);
+	module->packet = LoRa_receiver_packet(1, 1000, false, false);
 	if(module->packet._len != 0) {
 		if(module->led)
 			lora_led_struct_set_IN(module->packet._len);

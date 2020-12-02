@@ -27,6 +27,8 @@ class LoRa_class LoRa;
 #define REG_FRF_MID 0x07
 #define REG_FRF_LSB 0x08
 
+#define LoRa_DIO0_Pin
+#define LoRa_DIO1_Pin
 
 LoRa_class::LoRa_class(/* args */) {
 	init(nullptr);
