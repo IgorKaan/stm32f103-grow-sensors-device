@@ -1,0 +1,16 @@
+Sensor_TSL2561.c:121:6:TSL2561_getLux	40	static
+Sensor_TSL2561.c:197:6:TSL2561_clearInterrupt	24	static
+Sensor_TSL2561.c:219:6:TSL2561_WriteByte	24	static
+Sensor_TSL2561.c:9:6:TSL2561_setPowerUp	8	static
+Sensor_TSL2561.c:14:6:TSL2561_setPowerDown	8	static
+Sensor_TSL2561.c:172:6:TSL2561_setInterruptControl	8	static
+Sensor_TSL2561.c:231:6:TSL2561_ReadByte	24	static
+Sensor_TSL2561.c:27:6:TSL2561_setTiming	24	static
+Sensor_TSL2561.c:55:6:TSL2561_setTiming_ms	8	static
+Sensor_TSL2561.c:72:6:TSL2561_manualStart	16	static
+Sensor_TSL2561.c:92:6:TSL2561_manualStop	16	static
+Sensor_TSL2561.c:210:6:TSL2561_getID	8	static
+Sensor_TSL2561.c:251:6:TSL2561_readUInt	24	static
+Sensor_TSL2561.c:109:6:TSL2561_getData	8	static
+Sensor_TSL2561.c:278:6:TSL2561_writeUInt	16	static
+Sensor_TSL2561.c:185:6:TSL2561_setInterruptThreshold	8	static

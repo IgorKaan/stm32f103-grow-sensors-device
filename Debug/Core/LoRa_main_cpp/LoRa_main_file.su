@@ -1,0 +1,7 @@
+LoRa_main_file.cpp:30:6:bool Init_lora_module(SPI_HandleTypeDef*)	8	static
+LoRa_main_file.cpp:33:9:uint8_t Begin_lora_module(uint64_t, bool, uint8_t, uint8_t, uint64_t, uint8_t)	40	static
+LoRa_main_file.cpp:39:6:void Main_cpp(SensorsDataTypeDef*)	8	static
+LoRa_main_file.cpp:45:6:void Send_registration_packet()	8	static
+LoRa_main_file.cpp:50:6:void Contact_group_control_module()	24	static
+LoRa_main_file.cpp:77:1:cpp)	8	static
+LoRa_main_file.cpp:77:1:cpp)	8	static
