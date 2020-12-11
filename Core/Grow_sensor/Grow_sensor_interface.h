@@ -15,12 +15,11 @@ public:
     ~Grow_sensor_interface() = default;
 
     /// --- Сохранение в энергонезависимую память ---
-    // Получение размера строки
-    size_t get_size(Grow_sensor &grow_sensor);
-    // Заполение массива байтов, возврат количество байт (должен совпадать с размером строки)
-    size_t get_data(Grow_sensor &grow_sensor, uint8_t *data);
-    // Заполнение объекта класса по байтовой строке, возврат количество использованных байт
-    size_t set_data(Grow_sensor &grow_sensor, uint8_t *data, size_t available_size);
+    // заполнение классов, загруженными значениями
+    void load_data(Grow_sensor &grow_sensor, LoRa_contact_data& contact_data, uint32_t adr, uint32_t channel);
+    // получение значений для сохранения классов
+    bool save_data(const Grow_sensor &grow_sensor, const LoRa_contact_data& contact_data, uint32_t &adr, uint32_t &channel);
+
 
     /// --- Обмен с телефоном ---
     // фильтрация

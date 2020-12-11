@@ -36,7 +36,8 @@ Core/LoRa_main_cpp/LoRa_main_file.o: \
  /home/igor/Desktop/СПИИРАН/Автономная\ теплица/23/stm32f103-grow-sensors-device-master/Core/Packet_analyzer/Packet_analyzer.h \
  /home/igor/Desktop/СПИИРАН/Автономная\ теплица/23/stm32f103-grow-sensors-device-master/Core/Grow_sensor_component/Grow_sensor_component.h \
  /home/igor/Desktop/СПИИРАН/Автономная\ теплица/23/stm32f103-grow-sensors-device-master/Core/Grow_sensor/Grow_sensor.h \
- /home/igor/Desktop/СПИИРАН/Автономная\ теплица/23/stm32f103-grow-sensors-device-master/Core/Grow_sensor/Grow_sensor_interface.h
+ /home/igor/Desktop/СПИИРАН/Автономная\ теплица/23/stm32f103-grow-sensors-device-master/Core/Grow_sensor/Grow_sensor_interface.h \
+ /home/igor/Desktop/СПИИРАН/Автономная\ теплица/23/stm32f103-grow-sensors-device-master/Core/FlashPROM/FlashPROM.h
 
 ../Core/LoRa_main_cpp/../LoRa_main_cpp/LoRa_main_file.h:
 
@@ -113,3 +114,5 @@ Core/LoRa_main_cpp/LoRa_main_file.o: \
 /home/igor/Desktop/СПИИРАН/Автономная\ теплица/23/stm32f103-grow-sensors-device-master/Core/Grow_sensor/Grow_sensor.h:
 
 /home/igor/Desktop/СПИИРАН/Автономная\ теплица/23/stm32f103-grow-sensors-device-master/Core/Grow_sensor/Grow_sensor_interface.h:
+
+/home/igor/Desktop/СПИИРАН/Автономная\ теплица/23/stm32f103-grow-sensors-device-master/Core/FlashPROM/FlashPROM.h:

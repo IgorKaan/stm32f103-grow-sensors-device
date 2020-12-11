@@ -85,8 +85,9 @@ uint16_t cnt_task_1, cnt_task_2, cnt_task_3;
 
 uint8_t reg_done = 0;
 uint32_t res_addr = 0;
-buf32_t rdata[BUFFSIZE] = {0x00000000};
-uint32_t id;
+
+uint32_t control_module_id_and_channel[BUFFSIZE] = {0x00000000, 0x00000000};
+//buf32_t control_module_id;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -100,6 +101,7 @@ void Main_cpp(SensorsDataTypeDef* sensors_data);
 void Contact_group_control_module();
 bool Init_lora_module(SPI_HandleTypeDef *spi);
 void Send_registration_packet();
+void Get_control_module_info_from_main(uint32_t* id_main);
 uint8_t LoRa_begin(uint64_t frequency, bool paboost, uint8_t signal_power, uint8_t SF, uint64_t SBW, uint8_t sync_word);
 uint8_t Begin_lora_module(uint64_t frequency, bool paboost, uint8_t signal_power, uint8_t SF, uint64_t SBW, uint8_t sync_word);
 /* USER CODE END PFP */
@@ -138,6 +140,8 @@ int8_t user_i2c_write(uint8_t id, uint8_t reg_addr, uint8_t *data, uint16_t len)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	Read_control_module_info_from_flash(control_module_id_and_channel);
+	Get_control_module_info_from_main(control_module_id_and_channel);
 
   /* USER CODE END 1 */
 
@@ -165,6 +169,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   Init_lora_module(&hspi1);
   result = Begin_lora_module(BAND, true, 14, 8, 250E3, 0x4A);
+  HAL_Delay(1000);
   //result = LoRa_begin(BAND, true, 14, 11, 125E3, 0x4A)
   if(result == 0) {
 	  HAL_GPIO_WritePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin, GPIO_PIN_SET);
@@ -201,12 +206,8 @@ int main(void)
   dev.settings.filter = BME280_FILTER_COEFF_16;
   rslt = bme280_set_sensor_settings(BME280_OSR_PRESS_SEL | BME280_OSR_TEMP_SEL | BME280_OSR_HUM_SEL | BME280_FILTER_SEL, &dev);
   rslt = bme280_set_sensor_mode(BME280_NORMAL_MODE, &dev);
-  read_id_from_flash(&id);
-  if (*rdata == 0x00000000) {
-	  Send_registration_packet();
-  }
 
-
+  //HAL_Delay(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */

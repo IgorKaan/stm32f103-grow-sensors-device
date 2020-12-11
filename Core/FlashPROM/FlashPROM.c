@@ -3,15 +3,15 @@
 //extern CRC_HandleTypeDef hcrc;
 uint32_t res_addr;
 
-//buf32_t rdata[BUFFSIZE] = {0x00000000, 0x00000000};
-//buf32_t wdata[BUFFSIZE] = {0x00000000, 0x00000000};
+//uint32_t rdata[BUFFSIZE] = {0x00000000, 0x00000000};
+//uint32_t wdata[BUFFSIZE] = {0x00000000, 0x00000000};
 //uint8_t lora_address[3] = {0x00, 0x00, 0x00};
 
-void read_id_from_flash(buf32_t *buff) {
+void Read_control_module_info_from_flash(uint32_t *buff) {
 
-	  res_addr = flash_search_adress(STARTADDR, BUFFSIZE * DATAWIDTH);
+	  res_addr = Flash_search_adress(STARTADDR, BUFFSIZE * DATAWIDTH);
 
-	  read_last_data_in_flash(buff);
+	  Read_last_data_in_flash(buff);
 
 //	  if (rdata[0] == 0x0000) {
 //		  write_to_flash(wdata);
@@ -23,7 +23,7 @@ void read_id_from_flash(buf32_t *buff) {
 }
 
 //////////////////////// ОЧИСТКА ПАМЯТИ /////////////////////////////
-void erase_flash(void)
+void Erase_flash(void)
 {
 	static FLASH_EraseInitTypeDef EraseInitStruct;     // структура для очистки флеша
 
@@ -48,7 +48,7 @@ void erase_flash(void)
 }
 
 //////////////////////// ПОИСК СВОБОДНЫХ ЯЧЕЕК /////////////////////////////
-uint32_t flash_search_adress(uint32_t address, uint16_t cnt)
+uint32_t Flash_search_adress(uint32_t address, uint16_t cnt)
 {
 	uint16_t count_byte = cnt;
 
@@ -59,7 +59,7 @@ uint32_t flash_search_adress(uint32_t address, uint16_t cnt)
 
 		if(address == ENDMEMORY - 1) // если достигнут конец флеша
 		{
-			erase_flash();        // тогда очищаем память
+			Erase_flash();        // тогда очищаем память
 			return STARTADDR;     // устанавливаем адрес для записи с самого начала
 		}
 	}
@@ -68,9 +68,9 @@ uint32_t flash_search_adress(uint32_t address, uint16_t cnt)
 }
 
 //////////////////////// ЗАПИСЬ ДАННЫХ /////////////////////////////
-void write_to_flash(buf32_t *buff)
+void Write_to_flash(uint32_t *buff)
 {
-	res_addr = flash_search_adress(res_addr, BUFFSIZE * DATAWIDTH); // ищем свободные ячейки начиная с последнего известного адреса
+	res_addr = Flash_search_adress(res_addr, BUFFSIZE * DATAWIDTH); // ищем свободные ячейки начиная с последнего известного адреса
 
 	//////////////////////// ЗАПИСЬ ////////////////////////////
 	HAL_FLASH_Unlock(); // разблокировать флеш
@@ -109,7 +109,7 @@ void write_to_flash(buf32_t *buff)
 }
 
 //////////////////////// ЧТЕНИЕ ПОСЛЕДНИХ ДАННЫХ /////////////////////////////
-void read_last_data_in_flash(buf32_t *buff)
+void Read_last_data_in_flash(uint32_t *buff)
 {
 	if(res_addr == STARTADDR)
 	{
@@ -120,7 +120,7 @@ void read_last_data_in_flash(buf32_t *buff)
 
 	for(uint16_t i = 0; i < BUFFSIZE; i++)
 	{
-		buff[i] = *(buf32_t*)adr; // читаем
+		buff[i] = *(uint32_t*)adr; // читаем
 		adr = adr + DATAWIDTH;
 	}
 }

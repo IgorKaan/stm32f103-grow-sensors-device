@@ -114,11 +114,11 @@ bool LoRa_contact_data::set_my_adr(LoRa_address adr) {
     return false;
 }
 // Получаение адреса этого модуля
-LoRa_address LoRa_contact_data::get_my_adr() {
+LoRa_address LoRa_contact_data::get_my_adr() const {
     return my_adr_;
 }
     // Получаение адреса устройства соединения
-LoRa_address LoRa_contact_data::get_connect_adr() {
+LoRa_address LoRa_contact_data::get_connect_adr() const {
     return connect_adr_;
 }
 
@@ -131,7 +131,7 @@ bool LoRa_contact_data::set_channel(uint16_t channel) {
     return false;
 }
 // Получаение канала связи
-uint16_t LoRa_contact_data::get_channel() {
+uint16_t LoRa_contact_data::get_channel() const {
     return channel_;
 }
 
@@ -275,9 +275,11 @@ bool LoRa_contact_data::end_contact() {
     if((current_stage_.stade_communication != SC_DOWNTIME) &&
       ((current_stage_.stade_communication != SC_CONNECTION) || (current_stage_.type_communication != TC_RECIPIENT))) {
         clear();
+        current_stage_.stade_communication = SC_DOWNTIME;
         past_stage_ = current_stage_;
         return true;
     }
+    current_stage_.stade_communication = SC_DOWNTIME;
     past_stage_ = current_stage_;
     return false;
 }
@@ -1213,11 +1215,10 @@ uint32_t LoRa_contact_data::init_connection_wait(Stage_control& use_stage) {
 #endif
             else {
                 error = 114;
-                // if(!use_past_stage)
-                //     past_stage_ = current_stage_;
-                // else
-                //     current_stage_ = past_stage_;
-                past_stage_ = use_stage;
+                if(!use_past_stage)
+                    past_stage_ = current_stage_;
+                else
+                    current_stage_ = past_stage_;
                 // _стадия stade_communication_ = SC_DISCONNECT; // (!) -----
                 current_stage_.stade_communication = SC_DOWNTIME;
                 create_disconnet_packet(true);
@@ -1226,11 +1227,10 @@ uint32_t LoRa_contact_data::init_connection_wait(Stage_control& use_stage) {
         }
         else {
             if(check_packet_type(Packet_Type::CONNECTION, {0x02})) {
-                // if(!use_past_stage)
-                //     past_stage_ = current_stage_;
-                // else
-                //     current_stage_ = past_stage_;
-                past_stage_ = use_stage;
+                if(!use_past_stage)
+                    past_stage_ = current_stage_;
+                else
+                    current_stage_ = past_stage_;
                 current_stage_.connection = C_EXPECTATION; // ??? (?) -----
             }
             else {
@@ -1503,11 +1503,10 @@ uint32_t LoRa_contact_data::init_exchange_wait_numbers(Stage_control& use_stage)
                                                             #ifdef SERIAL_PRINT_ON
                                                             Serial.println("I.E.W.!R!.N");
                                                             #endif // SERIAL_PRINT_ON
-                // if(!use_past_stage)
-                //     past_stage_ = current_stage_;
-                // else
-                //     current_stage_ = past_stage_;
-                past_stage_ = use_stage;
+                if(!use_past_stage)
+                    past_stage_ = current_stage_;
+                else
+                    current_stage_ = past_stage_;
                 current_stage_.exchange = E_BOARDCAST;
                 send_packet_amt_ = 0;
                 // выбор номеров в data на основе принятых пакетов (?) -----
@@ -1888,11 +1887,10 @@ uint32_t LoRa_contact_data::recip_exchange_expect(Stage_control& use_stage) {
                 // подготовка пакета подтверждения о принятии N пакетов
                 create_amt_packet();
                 set_LoRa_mode_send();
-                // if(!use_past_stage)
-                //     past_stage_ = current_stage_;
-                // else
-                //     current_stage_ = past_stage_;
-                past_stage_ = use_stage;
+                if(!use_past_stage)
+                    past_stage_ = current_stage_;
+                else
+                    current_stage_ = past_stage_;
                 current_stage_.exchange = E_WAITING_REACTION;
             }
         }
@@ -1904,11 +1902,10 @@ uint32_t LoRa_contact_data::recip_exchange_expect(Stage_control& use_stage) {
                 // подготовка пакета подтверждения о принятии N пакетов
                 create_amt_packet();
                 set_LoRa_mode_send();
-                // if(!use_past_stage)
-                //     past_stage_ = current_stage_;
-                // else
-                //     current_stage_ = past_stage_;
-                past_stage_ = use_stage;
+                if(!use_past_stage)
+                    past_stage_ = current_stage_;
+                else
+                    current_stage_ = past_stage_;
                 current_stage_.exchange = E_WAITING_REACTION;
             }
             // (!) ----- заменить if ниже на "не пакеты контакта", кроме настроек и т.п.
@@ -2274,9 +2271,9 @@ void LoRa_contact_data::set_LoRa_mode_send(bool first) {
         time_first_packet_ = time_last_packet_;
 #if defined ( ESP32 )
     lora_.mode_sleep();
-    // delay(3);
+    delay(7);
     lora_.mode_FSTX();
-    // delay(3);
+    delay(7);
                                                             #if defined( SERIAL_PRINT_ON ) || defined( SERIAL_PRINT_ON_1)
                                                             LoRa_packet out;
                                                             out = last_send_packet_;
@@ -2300,9 +2297,9 @@ void LoRa_contact_data::set_LoRa_mode_send(bool first) {
                                                             #endif
 #else
     LoRa.mode_sleep();
-    //HAL_Delay(3);
+    for(int i = 0; i < 125000; i++) __NOP(); // HAL_Delay(3);
     LoRa.mode_FSTX();
-    //HAL_Delay(3);
+    for(int i = 0; i < 125000; i++) __NOP(); // HAL_Delay(3);
     LoRa.sender_packet(&last_send_packet_[0], last_send_packet_.get_len(), false);
 #endif
 }

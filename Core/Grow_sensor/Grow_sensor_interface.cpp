@@ -12,48 +12,21 @@ uint8_t data[50];
 
 // --- Сохранение в энергонезависимую память ---
 
-size_t Grow_sensor_interface::get_size(Grow_sensor &grow_sensor) {
-    // unsigned long _period; 4
-    // uint8_t _amt_component; 1
-    // Config_grow_sensor_component* _component; not save
-    size_t size = 5;
-    for(unsigned int i = 0; i < grow_sensor.component_.size(); ++i)
-        size += grow_sensor.component_[i].get_size();
-    return size;
+void Grow_sensor_interface::load_data(Grow_sensor &grow_sensor, LoRa_contact_data& contact_data, uint32_t adr, uint32_t channel) {
+	LoRa_address address(adr);
+    contact_data.set_my_adr(address);
+    address.branch = 0;
+    grow_sensor.set_address_control_module(address);
+    contact_data.set_channel(channel);
+    grow_sensor.set_active(2);
 }
-size_t Grow_sensor_interface::get_data(Grow_sensor &grow_sensor, uint8_t *data) {
-    if(data == nullptr)
-        return 0;
-    size_t size = 0;
-    data[size++] = (uint8_t)((grow_sensor.period_ >> 24) & 0xFF);
-    data[size++] = (uint8_t)((grow_sensor.period_ >> 16) & 0xFF);
-    data[size++] = (uint8_t)((grow_sensor.period_ >> 8) & 0xFF);
-    data[size++] = (uint8_t)(grow_sensor.period_ & 0xFF);
-    data[size++] = grow_sensor.component_.size();
-    for(unsigned int i = 0; i < grow_sensor.component_.size(); ++i)
-        size += grow_sensor.component_[i].get_data(data+size);
-    return size;
-}
-size_t Grow_sensor_interface::set_data(Grow_sensor &grow_sensor, uint8_t *data, size_t available_size) {
-    if(data == nullptr)
-        return 0;
-    size_t size = 0;
-    grow_sensor.component_.clear();
-    grow_sensor.period_  = ((ulong)data[size++]) << 24;
-    grow_sensor.period_ |= ((ulong)data[size++]) << 16;
-    grow_sensor.period_ |= ((ulong)data[size++]) << 8;
-    grow_sensor.period_ |= ((ulong)data[size++]);
-    uint8_t amt_component = data[size++];
-    if(amt_component != 0) {
-        grow_sensor.component_.resize(amt_component);
-        for(int i = 0; i < COUNT_TYPE_SENSOR; ++i)
-            id_mas_sensors[i] = 0;
-        for(int i = 0; i < amt_component; ++i) {
-            size += grow_sensor.component_[i].set_data(data+size, available_size-size);
-            grow_sensor.component_[i].set_id(id_mas_sensors[grow_sensor.component_[i].get_type()]++);            
-        }
-    }
-    return size;
+bool Grow_sensor_interface::save_data(const Grow_sensor &grow_sensor, const LoRa_contact_data& contact_data, uint32_t &adr, uint32_t &channel) {
+	if(grow_sensor.get_active() != 2)
+		return true;
+	adr = (contact_data.get_my_adr().group << 16 | contact_data.get_my_adr().branch);
+	//adr =
+	channel = contact_data.get_channel();
+	return false;
 }
 
 // --- Обмен с телефоном ---
@@ -133,11 +106,11 @@ bool Grow_sensor_interface::check_regist_packet(Grow_sensor &grow_sensor, LoRa_c
         	uint8_t err = 0;
             uint8_t size = 0;
             err = packet_system.get_size_by_packet(all_packets[i], size);
-            if((err != 0) || (size != (5+AMT_BYTES_SYSTEM_ID)))
+            if((err != 0) || (size != (3+AMT_BYTES_SYSTEM_ID)))
             	continue;
             uint8_t com = 0x00;
             uint8_t len = 0;
-//            uint8_t data[5 + AMT_BYTES_SYSTEM_ID];
+//            uint8_t data[3 + AMT_BYTES_SYSTEM_ID];
             packet_system.get_packet_data(all_packets[i], &com, data, &len);
             if(com != 0x01)
             	continue;
@@ -306,4 +279,3 @@ uint16_t Grow_sensor_interface::report_to_server(Grow_sensor &grow_sensor, uint8
     }
     return save_size;
 }
-
