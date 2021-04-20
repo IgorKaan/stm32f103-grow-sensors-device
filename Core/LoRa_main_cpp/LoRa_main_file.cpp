@@ -23,7 +23,7 @@ Type_sensor sensor_array[AMT_COMPONENT] = { Air_humidity, Air_temperature, Indic
 LoRa_contact_data contact_data;
 Grow_sensor grow_sensor(AMT_COMPONENT, sensor_array);
 
-extern uint32_t contact_status;
+uint32_t contact_status;
 
 uint32_t control_module_adr = 0;
 uint32_t control_module_channel = 0;

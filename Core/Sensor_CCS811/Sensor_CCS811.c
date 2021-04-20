@@ -27,7 +27,7 @@ uint8_t appStart = 0;
 uint32_t ELBaseline_period = 0;
 uint32_t ALBaseline_period = 0;
 uint8_t  Mode_CCS811 = 1;
-extern uint8_t ccs811_ID;
+uint8_t ccs811_ID;
 float relativeHumidity = 15.0, temperature = 26.0;
 
 void delay(uint32_t delayTime){

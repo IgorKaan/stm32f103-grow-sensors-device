@@ -24,7 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdlib.h>
 #include <string.h>
-//#include <Sensor_TSL2561.h>
+#include <Sensor_TSL2561.h>
 #include <stdbool.h>
 #include <math.h>
 #include "Sensor_CCS811.h"
@@ -43,6 +43,11 @@
 /* USER CODE BEGIN PD */
 //#define BAND	43325E4
 #define BAND	43455E4
+
+#define _TSL2561
+#define _BME280
+//#define	_CCS811
+#define _WATER_TEMP
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -51,6 +56,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc1;
+
 I2C_HandleTypeDef hi2c1;
 
 SPI_HandleTypeDef hspi1;
@@ -64,12 +71,8 @@ uint8_t STADY_CONACT_NUMBER = 0;
 
 SensorsDataTypeDef sensors_data;
 
-uint8_t result;
-uint8_t status;
-uint32_t contact_status = 0;
-unsigned  char time = 2;
-bool gain = 0;
-unsigned  int ms = 0;
+uint8_t LoRa_begin_result;
+
 // If gain = false (0), device is set to low gain (1X)
 // If gain = high (1), device is set to high gain (16X)
 // If time = 0, integration will be 13.7ms
@@ -77,23 +80,18 @@ unsigned  int ms = 0;
 // If time = 2, integration will be 402ms
 // If time = 3, use manual start / stop (ms = 0)
 // ms will be set to integration time
-												// TSL2561
+bool gain = 0;
+unsigned  int ms = 0;
 int8_t user_i2c_write(uint8_t id, uint8_t reg_addr, uint8_t *data, uint16_t len);
 int8_t user_i2c_read(uint8_t id, uint8_t reg_addr, uint8_t *data, uint16_t len);
 void user_delay_ms(uint32_t period);
+												// TSL2561
 struct bme280_dev dev = {.dev_id = BME280_I2C_ADDR_SEC, .intf = BME280_I2C_INTF, .read = user_i2c_read, .write = user_i2c_write, .delay_ms = user_delay_ms};
 struct bme280_data comp_data;
+
 int8_t rslt;
 uint16_t exti5_10, exti2;
 uint16_t cnt_task_1, cnt_task_2, cnt_task_3;
-
-uint8_t ccs811_ID = 0;
-uint32_t CO2_tVOC_res = 0;
-uint16_t CO2 = 0;
-uint16_t tVOC = 0;
-
-uint8_t reg_done = 0;
-uint32_t res_addr = 0;
 
 uint32_t control_module_id_and_channel[BUFFSIZE] = {0x00000000, 0x00000000};
 //buf32_t control_module_id;
@@ -105,7 +103,9 @@ static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_ADC1_Init(void);
 /* USER CODE BEGIN PFP */
+void SensorsGetValues();
 void Main_cpp(SensorsDataTypeDef* sensors_data);
 void Contact_group_control_module();
 bool Init_lora_module(SPI_HandleTypeDef *spi);
@@ -121,7 +121,6 @@ int8_t user_i2c_read(uint8_t id, uint8_t reg_addr, uint8_t *data, uint16_t len)
 {
   if(HAL_I2C_Master_Transmit(&hi2c1, (id << 1), &reg_addr, 1, 10) != HAL_OK) return -1;
   if(HAL_I2C_Master_Receive(&hi2c1, (id << 1) | 0x01, data, len, 10) != HAL_OK) return -1;
-
   return 0;
 }
 
@@ -151,7 +150,6 @@ int main(void)
   /* USER CODE BEGIN 1 */
   Read_control_module_info_from_flash(control_module_id_and_channel);
   Get_control_module_info_from_main(control_module_id_and_channel);
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -175,37 +173,31 @@ int main(void)
   MX_I2C1_Init();
   MX_SPI1_Init();
   MX_TIM2_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
   Init_lora_module(&hspi1);
-  result = Begin_lora_module(BAND, true, 14, 8, 250E3, 0x4A);
-  //result = LoRa_begin(BAND, true, 14, 11, 125E3, 0x4A)
-  if(result == 0) {
-	  HAL_GPIO_WritePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(LED2_PIN_GPIO_Port, LED2_PIN_Pin, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(LED3_PIN_GPIO_Port, LED3_PIN_Pin, GPIO_PIN_SET);
-	  HAL_Delay(500);
-	  HAL_GPIO_WritePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(LED2_PIN_GPIO_Port, LED2_PIN_Pin, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(LED3_PIN_GPIO_Port, LED3_PIN_Pin, GPIO_PIN_RESET);
-	  HAL_Delay(500);
-	  HAL_GPIO_WritePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(LED2_PIN_GPIO_Port, LED2_PIN_Pin, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(LED3_PIN_GPIO_Port, LED3_PIN_Pin, GPIO_PIN_SET);
-	  HAL_Delay(500);
-	  HAL_GPIO_WritePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(LED2_PIN_GPIO_Port, LED2_PIN_Pin, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(LED3_PIN_GPIO_Port, LED3_PIN_Pin, GPIO_PIN_RESET);
-	  while(result != 0) {
-		  result = Begin_lora_module(BAND, true, 14, 8, 250E3, 0x4A);
+  LoRa_begin_result = Begin_lora_module(BAND, true, 14, 8, 250E3, 0x4A);
+  //LoRa_begin_result = LoRa_begin(BAND, true, 14, 11, 125E3, 0x4A)
+  if(LoRa_begin_result == 0) {
+	  for (int i = 0; i < 3; ++i) {
+		  HAL_GPIO_TogglePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin);
+		  HAL_GPIO_TogglePin(LED2_PIN_GPIO_Port, LED2_PIN_Pin);
+		  HAL_GPIO_TogglePin(LED3_PIN_GPIO_Port, LED3_PIN_Pin);
+	  }
+	  while(LoRa_begin_result != 0) {
+		  LoRa_begin_result = Begin_lora_module(BAND, true, 14, 8, 250E3, 0x4A);
 			  HAL_GPIO_WritePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin, GPIO_PIN_SET);
 			  HAL_GPIO_WritePin(LED2_PIN_GPIO_Port, LED2_PIN_Pin, GPIO_PIN_RESET);
 			  HAL_GPIO_WritePin(LED3_PIN_GPIO_Port, LED3_PIN_Pin, GPIO_PIN_RESET);
 	  }
   }
-//  unsigned  char time = 2;
-//  TSL2561_setTiming_ms (gain, time, & ms);
-//  TSL2561_setPowerUp ();
+#ifdef _TSL2561
+  unsigned  char time = 2;
+  TSL2561_setTiming_ms (gain, time, & ms);
+  TSL2561_setPowerUp ();
+#endif
 
+#ifdef _BME280
   rslt = bme280_init(&dev);
 
   dev.settings.osr_h = BME280_OVERSAMPLING_1X;
@@ -214,7 +206,11 @@ int main(void)
   dev.settings.filter = BME280_FILTER_COEFF_16;
   rslt = bme280_set_sensor_settings(BME280_OSR_PRESS_SEL | BME280_OSR_TEMP_SEL | BME280_OSR_HUM_SEL | BME280_FILTER_SEL, &dev);
   rslt = bme280_set_sensor_mode(BME280_NORMAL_MODE, &dev);
+#endif
+
+#ifdef _CCS811
   configureCCS811();
+#endif
   HAL_Delay(1000);
   /* USER CODE END 2 */
 
@@ -226,25 +222,8 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	HAL_GPIO_TogglePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin);
-//	unsigned int data0, data1;
-//	if (TSL2561_getData(&data0, &data1))
-//	{
-//		double lux;
-//		TSL2561_getLux(gain, ms, data0, data1, &lux);
-//		sensors_data.lux = lux;
-//		//lora_sensor_set_data(&illumination_sensor,(float)lux);
-//	}
-	rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, &dev);
-	if(rslt == BME280_OK)
-	{
-		sensors_data.temperature = comp_data.temperature / 100.0;      /* C  */
-		sensors_data.humidity = comp_data.humidity / 1024.0;           /* %   */
-		sensors_data.pressure = comp_data.pressure / 10000.0 / 1.333;  /* hPa or mmhg */
-	}
-	CO2_tVOC_res = readAlgorithmResults();
-	sensors_data.CO2 = (uint16_t)(CO2_tVOC_res >> 16);
-	sensors_data.TVOC = (uint16_t)CO2_tVOC_res;
-	HAL_Delay(5000);
+	SensorsGetValues();
+	HAL_Delay(3000);
 	Main_cpp(&sensors_data);
   }
   /* USER CODE END 3 */
@@ -258,6 +237,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -283,6 +263,57 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
+  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV2;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief ADC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC1_Init(void)
+{
+
+  /* USER CODE BEGIN ADC1_Init 0 */
+
+  /* USER CODE END ADC1_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC1_Init 1 */
+
+  /* USER CODE END ADC1_Init 1 */
+  /** Common config
+  */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.NbrOfConversion = 1;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_8;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC1_Init 2 */
+
+  /* USER CODE END ADC1_Init 2 */
+
 }
 
 /**
@@ -463,6 +494,37 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   } else{
     __NOP();
   }
+}
+
+void SensorsGetValues() {
+#ifdef _TSL2561
+	unsigned int data0, data1;
+	if (TSL2561_getData(&data0, &data1))
+	{
+		double lux;
+		TSL2561_getLux(gain, ms, data0, data1, &lux);
+		sensors_data.lux = lux;
+		//lora_sensor_set_data(&illumination_sensor,(float)lux);
+	}
+#endif
+
+#ifdef _BME280
+	rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, &dev);
+	if(rslt == BME280_OK)
+	{
+		sensors_data.temperature = comp_data.temperature / 100.0;      /* C  */
+		sensors_data.humidity = comp_data.humidity / 1024.0;           /* %   */
+		sensors_data.pressure = comp_data.pressure / 10000.0 / 1.333;  /* hPa or mmhg */
+	}
+#endif
+
+#ifdef _CCS811
+	uint32_t CO2_tVOC_res = 0;
+
+	CO2_tVOC_res = readAlgorithmResults();
+	sensors_data.CO2 = (uint16_t)(CO2_tVOC_res >> 16);
+	sensors_data.TVOC = (uint16_t)CO2_tVOC_res;
+#endif
 }
 /* USER CODE END 4 */
 
