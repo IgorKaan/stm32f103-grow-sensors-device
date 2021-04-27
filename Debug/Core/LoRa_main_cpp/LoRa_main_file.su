@@ -1,8 +1,9 @@
-LoRa_main_file.cpp:45:6:void Get_control_module_info_from_main(uint32_t*)	0	static
-LoRa_main_file.cpp:50:6:void Send_registration_packet()	0	static
-LoRa_main_file.cpp:54:6:bool Init_lora_module(SPI_HandleTypeDef*)	0	static
-LoRa_main_file.cpp:57:9:uint8_t Begin_lora_module(uint64_t, bool, uint8_t, uint8_t, uint64_t, uint8_t)	48	static
-LoRa_main_file.cpp:72:6:void Main_cpp(SensorsDataTypeDef*)	16	static
-LoRa_main_file.cpp:86:6:void Contact_group_control_module()	32	static
-LoRa_main_file.cpp:120:1:cpp)	8	static
-LoRa_main_file.cpp:120:1:cpp)	8	static
+LoRa_main_file.cpp:47:6:void Get_control_module_info_from_main(uint32_t*)	0	static
+LoRa_main_file.cpp:52:6:void Send_registration_packet()	0	static
+LoRa_main_file.cpp:56:6:bool Init_lora_module(SPI_HandleTypeDef*)	0	static
+LoRa_main_file.cpp:59:9:uint8_t Begin_lora_module(uint64_t, bool, uint8_t, uint8_t, uint64_t, uint8_t)	48	static
+LoRa_main_file.cpp:74:6:void Main_cpp(SensorsDataTypeDef*)	16	static
+LoRa_main_file.cpp:88:6:void LoRa_sleep()	16	static,ignoring_inline_asm
+LoRa_main_file.cpp:98:6:void Contact_group_control_module()	24	static
+LoRa_main_file.cpp:133:1:cpp)	8	static
+LoRa_main_file.cpp:133:1:cpp)	8	static

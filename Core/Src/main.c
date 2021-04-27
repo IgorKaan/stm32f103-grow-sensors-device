@@ -41,12 +41,12 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-//#define BAND	43325E4
-#define BAND	43455E4
+#define BAND	43325E4
+//#define BAND	43455E4
 
 //#define _TSL2561
 #define _BME280
-#define	_CCS811
+//#define	_CCS811
 //#define _WATER_TEMP
 /* USER CODE END PD */
 
@@ -100,6 +100,8 @@ uint16_t cnt_task_1, cnt_task_2, cnt_task_3;
 
 uint16_t water_temp = 0;
 
+volatile bool end_contact = false;
+
 uint32_t control_module_id_and_channel[BUFFSIZE] = {0x00000000, 0x00000000};
 
 //buf32_t control_module_id;
@@ -114,6 +116,7 @@ static void MX_TIM2_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM4_Init(void);
 /* USER CODE BEGIN PFP */
+void LoRa_sleep();
 void SensorsGetValues();
 void Main_cpp(SensorsDataTypeDef* sensors_data);
 void Contact_group_control_module();
@@ -156,8 +159,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		//HAL_ResumeTick();
 		//HAL_GPIO_TogglePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin);
 		tim4++;
-		SensorsGetValues();
-		Main_cpp(&sensors_data);
+		// if end_contact
+//			SensorsGetValues();
+//			Main_cpp(&sensors_data);
+			// wake up
 		//HAL_Delay(2000);
 
 	}
@@ -243,8 +248,11 @@ int main(void)
 #endif
   HAL_ADCEx_Calibration_Start(&hadc1);
   HAL_Delay(1000);
-  HAL_TIM_Base_Start_IT(&htim4);
+  //HAL_TIM_Base_Start_IT(&htim4);
   //HAL_PWR_EnableSleepOnExit();
+  //end_contact = true;
+  SensorsGetValues();
+  Main_cpp(&sensors_data);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -254,9 +262,20 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	HAL_SuspendTick();
-//	HAL_PWR_EnterSLEEPMode(PWR_LOWPOWERREGULATOR_ON, PWR_SLEEPENTRY_WFI);
 
+	if (end_contact) {
+		end_contact = false;
+		HAL_Delay(100);
+		HAL_TIM_Base_Start_IT(&htim4);
+		HAL_Delay(100);
+		LoRa_sleep();
+		HAL_SuspendTick();
+		HAL_PWR_EnterSLEEPMode(PWR_LOWPOWERREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+		HAL_ResumeTick();
+		HAL_TIM_Base_Stop_IT(&htim4);
+		SensorsGetValues();
+		Main_cpp(&sensors_data);
+	}
   }
   /* USER CODE END 3 */
 }
@@ -486,9 +505,9 @@ static void MX_TIM4_Init(void)
 
   /* USER CODE END TIM4_Init 1 */
   htim4.Instance = TIM4;
-  htim4.Init.Prescaler = 3999;
+  htim4.Init.Prescaler = 7999;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 9999;
+  htim4.Init.Period = 55999;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
@@ -497,6 +516,10 @@ static void MX_TIM4_Init(void)
   }
   sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
   if (HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_OnePulse_Init(&htim4, TIM_OPMODE_SINGLE) != HAL_OK)
   {
     Error_Handler();
   }

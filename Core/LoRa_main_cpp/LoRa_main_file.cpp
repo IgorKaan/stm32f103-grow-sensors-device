@@ -33,6 +33,8 @@ uint32_t contact_status;
 uint32_t control_module_adr = 0;
 uint32_t control_module_channel = 0;
 
+extern volatile bool end_contact;
+
 
 enum {
     REGISTRATION_MODE = 0,
@@ -83,6 +85,16 @@ void Main_cpp(SensorsDataTypeDef* sensors_data) {
 	grow_sensor_interface.build_data_packet(grow_sensor, contact_data);
 }
 
+void LoRa_sleep() {
+	// sleep LoRa module
+    NVIC_DisableIRQ(EXTI15_10_IRQn);
+    NVIC_DisableIRQ(EXTI2_IRQn);
+    contact_data.end_contact();
+    NVIC_EnableIRQ(EXTI2_IRQn);
+    NVIC_EnableIRQ(EXTI15_10_IRQn);
+	// Sleep STM
+}
+
 void Contact_group_control_module() {
 	contact_status = contact_data.work_contact_system();
 	switch (current_mode) {
@@ -111,7 +123,8 @@ void Contact_group_control_module() {
 	        }
 	        if(contact_data.get_signal_complete()) {
 	        	grow_sensor_interface.read_received_data_packets(grow_sensor, contact_data);
-	            contact_data.wait_recipient(grow_sensor.get_address_control_module());
+	        	end_contact = true;
+	            //contact_data.wait_recipient(grow_sensor.get_address_control_module());
 	        }
 		}
 	}
