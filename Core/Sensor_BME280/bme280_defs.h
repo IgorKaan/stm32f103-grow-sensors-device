@@ -357,6 +357,12 @@ struct bme280_dev {
 	struct bme280_settings settings;
 };
 
+struct bme280_offset {
+	float humidity_offset;
+	float temperature_offset;
+	float pressure_offset;
+};
+
 #endif /* BME280_DEFS_H_ */
 /** @}*/
 /** @}*/

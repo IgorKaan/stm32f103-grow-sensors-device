@@ -44,10 +44,10 @@
 //#define BAND	43325E4
 #define BAND	43455E4
 
-#define _TSL2561
+//#define _TSL2561
 #define _BME280
-//#define	_CCS811
-#define _WATER_TEMP
+#define	_CCS811
+//#define _WATER_TEMP
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -63,6 +63,7 @@ I2C_HandleTypeDef hi2c1;
 SPI_HandleTypeDef hspi1;
 
 TIM_HandleTypeDef htim2;
+TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN PV */
 
@@ -87,13 +88,20 @@ int8_t user_i2c_read(uint8_t id, uint8_t reg_addr, uint8_t *data, uint16_t len);
 void user_delay_ms(uint32_t period);
 												// TSL2561
 struct bme280_dev dev = {.dev_id = BME280_I2C_ADDR_SEC, .intf = BME280_I2C_INTF, .read = user_i2c_read, .write = user_i2c_write, .delay_ms = user_delay_ms};
+struct bme280_offset offset = {.humidity_offset = 5.0, .pressure_offset = 0.0, .temperature_offset = 0.0 };
 struct bme280_data comp_data;
 
+uint8_t tim4 = 0;
+
 int8_t rslt;
+
 uint16_t exti5_10, exti2;
 uint16_t cnt_task_1, cnt_task_2, cnt_task_3;
 
+uint16_t water_temp = 0;
+
 uint32_t control_module_id_and_channel[BUFFSIZE] = {0x00000000, 0x00000000};
+
 //buf32_t control_module_id;
 /* USER CODE END PV */
 
@@ -104,6 +112,7 @@ static void MX_I2C1_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_ADC1_Init(void);
+static void MX_TIM4_Init(void);
 /* USER CODE BEGIN PFP */
 void SensorsGetValues();
 void Main_cpp(SensorsDataTypeDef* sensors_data);
@@ -139,6 +148,20 @@ int8_t user_i2c_write(uint8_t id, uint8_t reg_addr, uint8_t *data, uint16_t len)
   free(buf);
   return 0;
 }
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if(htim->Instance == TIM4) //check if the interrupt comes from TIM1
+	{
+		//HAL_ResumeTick();
+		//HAL_GPIO_TogglePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin);
+		tim4++;
+		SensorsGetValues();
+		Main_cpp(&sensors_data);
+		//HAL_Delay(2000);
+
+	}
+}
 /* USER CODE END 0 */
 
 /**
@@ -148,6 +171,7 @@ int8_t user_i2c_write(uint8_t id, uint8_t reg_addr, uint8_t *data, uint16_t len)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+
   Read_control_module_info_from_flash(control_module_id_and_channel);
   Get_control_module_info_from_main(control_module_id_and_channel);
   /* USER CODE END 1 */
@@ -174,15 +198,17 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM2_Init();
   MX_ADC1_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
   Init_lora_module(&hspi1);
   LoRa_begin_result = Begin_lora_module(BAND, true, 14, 8, 250E3, 0x4A);
   //LoRa_begin_result = LoRa_begin(BAND, true, 14, 11, 125E3, 0x4A)
   if(LoRa_begin_result == 0) {
-	  for (int i = 0; i < 3; ++i) {
+	  for (int i = 0; i < 5; ++i) {
 		  HAL_GPIO_TogglePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin);
 		  HAL_GPIO_TogglePin(LED2_PIN_GPIO_Port, LED2_PIN_Pin);
 		  HAL_GPIO_TogglePin(LED3_PIN_GPIO_Port, LED3_PIN_Pin);
+		  HAL_Delay(500);
 	  }
 	  while(LoRa_begin_result != 0) {
 		  LoRa_begin_result = Begin_lora_module(BAND, true, 14, 8, 250E3, 0x4A);
@@ -191,6 +217,9 @@ int main(void)
 			  HAL_GPIO_WritePin(LED3_PIN_GPIO_Port, LED3_PIN_Pin, GPIO_PIN_RESET);
 	  }
   }
+  HAL_GPIO_WritePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED2_PIN_GPIO_Port, LED2_PIN_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED3_PIN_GPIO_Port, LED3_PIN_Pin, GPIO_PIN_RESET);
 #ifdef _TSL2561
   unsigned  char time = 2;
   TSL2561_setTiming_ms (gain, time, & ms);
@@ -206,12 +235,16 @@ int main(void)
   dev.settings.filter = BME280_FILTER_COEFF_16;
   rslt = bme280_set_sensor_settings(BME280_OSR_PRESS_SEL | BME280_OSR_TEMP_SEL | BME280_OSR_HUM_SEL | BME280_FILTER_SEL, &dev);
   rslt = bme280_set_sensor_mode(BME280_NORMAL_MODE, &dev);
+  //bme280_compensate_data(BME280_OSR_HUM_SEL, uncomp_data, comp_data, calib_data)
 #endif
 
 #ifdef _CCS811
   configureCCS811();
 #endif
+  HAL_ADCEx_Calibration_Start(&hadc1);
   HAL_Delay(1000);
+  HAL_TIM_Base_Start_IT(&htim4);
+  //HAL_PWR_EnableSleepOnExit();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -221,10 +254,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	HAL_GPIO_TogglePin(LED1_PIN_GPIO_Port, LED1_PIN_Pin);
-	SensorsGetValues();
-	HAL_Delay(3000);
-	Main_cpp(&sensors_data);
+//	HAL_SuspendTick();
+//	HAL_PWR_EnterSLEEPMode(PWR_LOWPOWERREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+
   }
   /* USER CODE END 3 */
 }
@@ -245,7 +277,9 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI_DIV2;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -254,9 +288,9 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
@@ -305,7 +339,7 @@ static void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_8;
   sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  sConfig.SamplingTime = ADC_SAMPLETIME_55CYCLES_5;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -332,7 +366,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.ClockSpeed = 400000;
+  hi2c1.Init.ClockSpeed = 100000;
   hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
@@ -373,7 +407,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -434,6 +468,51 @@ static void MX_TIM2_Init(void)
 }
 
 /**
+  * @brief TIM4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM4_Init(void)
+{
+
+  /* USER CODE BEGIN TIM4_Init 0 */
+
+  /* USER CODE END TIM4_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM4_Init 1 */
+
+  /* USER CODE END TIM4_Init 1 */
+  htim4.Instance = TIM4;
+  htim4.Init.Prescaler = 3999;
+  htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim4.Init.Period = 9999;
+  htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM4_Init 2 */
+
+  /* USER CODE END TIM4_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -443,7 +522,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
@@ -487,9 +565,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   if(GPIO_Pin== GPIO_PIN_2) {
     exti2++;
+    //HAL_ResumeTick();
     Contact_group_control_module();
   } else if(GPIO_Pin== GPIO_PIN_10){
     exti5_10++;
+    //HAL_ResumeTick();
     Contact_group_control_module();
   } else{
     __NOP();
@@ -513,7 +593,7 @@ void SensorsGetValues() {
 	if(rslt == BME280_OK)
 	{
 		sensors_data.temperature = comp_data.temperature / 100.0;      /* C  */
-		sensors_data.humidity = comp_data.humidity / 1024.0;           /* %   */
+		sensors_data.humidity = (comp_data.humidity / 1024.0) + offset.humidity_offset;           /* %   */
 		sensors_data.pressure = comp_data.pressure / 10000.0 / 1.333;  /* hPa or mmhg */
 	}
 #endif
@@ -525,7 +605,17 @@ void SensorsGetValues() {
 	sensors_data.CO2 = (uint16_t)(CO2_tVOC_res >> 16);
 	sensors_data.TVOC = (uint16_t)CO2_tVOC_res;
 #endif
+
+#ifdef _WATER_TEMP
+	HAL_ADC_Start(&hadc1);
+	HAL_ADC_PollForConversion(&hadc1, 100);
+	water_temp = HAL_ADC_GetValue(&hadc1);
+	sensors_data.water_temperature = water_temp;
+	HAL_ADC_Stop(&hadc1);
+#endif
 }
+
+
 /* USER CODE END 4 */
 
 /**

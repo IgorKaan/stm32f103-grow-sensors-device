@@ -11,6 +11,7 @@ typedef struct {
 	float pressure;
 	float CO2;
 	float TVOC;
+	float water_temperature;
 } SensorsDataTypeDef;
 
 #endif // __LORA_MAIN_FILE_H__

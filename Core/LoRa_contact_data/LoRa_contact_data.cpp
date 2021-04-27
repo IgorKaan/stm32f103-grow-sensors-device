@@ -2305,9 +2305,9 @@ void LoRa_contact_data::set_LoRa_mode_send(bool first) {
                                                             #endif
 #else
     LoRa.mode_sleep();
-    for(int i = 0; i < 125000; i++) __NOP(); // HAL_Delay(3);
+    for(int i = 0; i < 12500; i++) __NOP(); // HAL_Delay(3);
     LoRa.mode_FSTX();
-    for(int i = 0; i < 125000; i++) __NOP(); // HAL_Delay(3);
+    for(int i = 0; i < 12500; i++) __NOP(); // HAL_Delay(3);
     LoRa.sender_packet(&last_send_packet_[0], last_send_packet_.get_len(), false);
 #endif
 }

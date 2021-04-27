@@ -6,19 +6,24 @@
 #include <array>
 
 constexpr std::array<uint8_t, AMT_BYTES_SYSTEM_ID> MODULE_ID =
-        {0x5f, 0xdc, 0xbe, 0xda, 0x5f, 0x25, 0x97, 0x30, 0x86, 0x17, 0x08, 0xa1};
+	{ 0x60, 0x86, 0xd0, 0x0e, 0x34, 0x2b, 0x73, 0x2b, 0x2d, 0x4a, 0x42, 0x77 };
 //		{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x06, 0x06, 0x06, 0x01, 0x01, 0x01};
-//        {0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x06, 0x06, 0x06};
-//        {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-//		  {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+
+//constexpr std::array<uint8_t, AMT_BYTES_SYSTEM_ID> MODULE_ID =
+//	{ 0x60, 0x86, 0xd0, 0x2a, 0x34, 0x2b, 0x73, 0x2b, 0x2d, 0x4a, 0x42, 0x78 };
 
 //const uint8_t AMT_COMPONENT = 1;
 //Type_sensor sensor_array[AMT_COMPONENT] = { Illumination_level };
 
 const uint8_t AMT_COMPONENT = 3;
+	Type_sensor sensor_array[AMT_COMPONENT] =  { Air_humidity, Air_temperature, Indicator_eCO2 };
 //Type_sensor sensor_array[AMT_COMPONENT] = { Air_humidity, Air_temperature, Illumination_level };
-Type_sensor sensor_array[AMT_COMPONENT] = { Air_humidity, Air_temperature, Indicator_eCO2 };
+//Type_sensor sensor_array[AMT_COMPONENT] = { Air_humidity, Air_temperature, Indicator_eCO2 };
 
+
+//const uint8_t AMT_COMPONENT = 5;
+//	Type_sensor sensor_array[AMT_COMPONENT] =  { Air_humidity, Air_temperature, Water_temperature, Illumination_level, Indicator_eCO2 };
 
 LoRa_contact_data contact_data;
 Grow_sensor grow_sensor(AMT_COMPONENT, sensor_array);
@@ -65,7 +70,13 @@ uint8_t Begin_lora_module(uint64_t frequency, bool paboost, uint8_t signal_power
 }
 
 void Main_cpp(SensorsDataTypeDef* sensors_data) {
-//	grow_sensor.set_value(0, sensors_data->lux);
+//	grow_sensor.set_value(0, sensors_data->humidity);
+//	grow_sensor.set_value(1, sensors_data->temperature);
+//	grow_sensor.set_value(2, sensors_data->water_temperature);
+//	grow_sensor.set_value(3, sensors_data->lux);
+//	grow_sensor.set_value(4, sensors_data->CO2);
+//	grow_sensor_interface.build_data_packet(grow_sensor, contact_data);
+
 	grow_sensor.set_value(0, sensors_data->humidity);
 	grow_sensor.set_value(1, sensors_data->temperature);
 	grow_sensor.set_value(2, sensors_data->CO2);
